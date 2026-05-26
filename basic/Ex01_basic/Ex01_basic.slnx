@@ -1,0 +1,8 @@
+<Solution>
+  <Project Path="ConsoleApp01/ConsoleApp01.csproj" />
+  <Project Path="ConsoleApp02/ConsoleApp02.csproj" />
+  <Project Path="Prac03Syntax/Prac03Syntax.csproj" />
+  <Project Path="Prac04Collection/Prac04Collection.csproj" />
+  <Project Path="Prac05Exception/Prac05Exception.csproj" />
+  <Project Path="Prac06Arrange/Prac06Arrange.csproj" />
+</Solution>
