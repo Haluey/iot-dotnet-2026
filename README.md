@@ -1,9 +1,9 @@
 # iot-dotnet-2026
 IoT 개발자 닷넷 리포지토리(기본, 중급, 응용, 프로젝트)
 
-## 1일차
+## C# 기본
 
-### C# 기본
+### C# 개요
 
 - 현 세대 프로그래밍 언어 랭킹 5위
 - C++, Python, JAVA와 동일한 객체지향 프로그래밍 언어
@@ -49,7 +49,7 @@ IoT 개발자 닷넷 리포지토리(기본, 중급, 응용, 프로젝트)
 
 - C > C++ > JAVA > C# > Python
 
-### C# 기본 구현
+### C# 콘솔 구현 순서
 
 1. Visual Studio 실행
 
@@ -76,7 +76,7 @@ IoT 개발자 닷넷 리포지토리(기본, 중급, 응용, 프로젝트)
 
     ![alt text](image-3.png)
 
-9. 만들기 버튼 클릭
+9. 만들기 버튼 클릭 - [소스](./basic/Ex01_basic/ConsoleApp01/Program.cs)
 
     ```cs
     // 최신 방식 - 처음 학습 시에 도움이 안되는 방식
@@ -87,7 +87,7 @@ IoT 개발자 닷넷 리포지토리(기본, 중급, 응용, 프로젝트)
 
 ### C# 기본 문법
 
-- 기본 문법
+- 기본 문법 - [소스](./basic/Ex01_basic/ConsoleApp02/Program.cs)
 
     ```cs
     using System;
@@ -115,7 +115,7 @@ IoT 개발자 닷넷 리포지토리(기본, 중급, 응용, 프로젝트)
 
 - 주석 : 한 줄 주석(//), 여러줄 주석(/* */), XML주석(///)
 
-- 변수와 타입
+- 변수와 타입 - [소스](./basic/Ex01_basic/Prac03Syntax/Program.cs)
     - 초기화 : `[접근제한자] [타입] [변수명]`
 
     - 기본타입(구조체) : sbyte, byte, short, ushort, int, uint, long, ulong, float, double, decimal, char, bool 등
@@ -180,7 +180,7 @@ IoT 개발자 닷넷 리포지토리(기본, 중급, 응용, 프로젝트)
     - set; : 속성값을 변경할 수 있음
     - get; set; : 둘 다 가능
 
-- 컬렉션
+- 컬렉션 - [소스](./basic/Ex01_basic/Prac04Collection/Program.cs)
     - 배열, 리스트 등 여러 요소를 묶어서 사용하는 구조
     - ArrayList, List, Hashtable, Dictionary, Stach, Queue, Hashset 등
     - 배열보다 컬렉션을 사용할 것
@@ -190,7 +190,7 @@ IoT 개발자 닷넷 리포지토리(기본, 중급, 응용, 프로젝트)
     - foreach : Python `for i in range(n)` 와 동일
     - 보기 > 개체 브라우저
 
-- 예외처리
+- 예외처리 - [소스](./basic/Ex01_basic/Prac05Exception/Program.cs)
     - try ~ catch ~ finally 형식 사용 가능
 
 ### MSDN(MicroSoft Developer Network)
@@ -213,9 +213,9 @@ IoT 개발자 닷넷 리포지토리(기본, 중급, 응용, 프로젝트)
     - .NET Framework : .NET Framework 4.8 이전 구형 개발방식
     - 기본 : .NET 5.0 이상의 최신 개발방식
 
-### 윈폼즈 앱 구현
+### 윈폼즈 앱 구현 순서
 
-1. 새 프로젝트
+1. 새 프로젝트 - [위치](./winapp/IoT02WinSolution/)
 2. 프로젝트명, 위치, 솔루션명 지정 후
 3. 프레임워크 .NET 10.0 선택 후 만들기
 4. IDE 툴에서 펑션키 F4로 속성창 오픈
@@ -223,7 +223,22 @@ IoT 개발자 닷넷 리포지토리(기본, 중급, 응용, 프로젝트)
 6. 기본 개발화면
 
     ![alt text](image-6.png)
+
 7. 저장할 때는 항상 Ctrl + Shift + S (모두 저장)
 8. 도구상자의 컨트롤을 디자인 화면으로 드래그해서 구성(더블 클릭X)
 9. 컨트롤의 속성 변경으로 디자인 적용
 10. 컨트롤의 이벤트 추가로 기능 구현
+11. 디자이너 화면 `F7` <-> 비하인드 코드 `Shift + F7`
+12. `Ctrl + Space`, `Alt + Enter` VS(VS Code 포함)
+
+![alt text](image-7.png)
+
+### 윈폼즈앱 용어
+
+- 모달/모달리스 : 부모창과 자식창의 관계
+    - 모달(Modal) : 서브창 종료 전에는 부모창 제어 불가
+    - 모달리스(Modaless) : 서브창 종료와 관계없이 부모창 제어 가능
+
+- 속성 변경방법
+    - 디자인타임 변경 : [디자인] 작업 시 속성창의 속성값 변경
+    - 런타임 변경 : 비하인드 코드내에서 속성값을 변경. 실행 시 변경되는 것
