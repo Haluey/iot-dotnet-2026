@@ -17,8 +17,11 @@ namespace DotNet06DbBooksApp
 
         private void BtnLoad_Click(object sender, EventArgs e)
         {
+            // SQL 쿼리문 작성
             string query = "SELECT book_idx, author, div_code, book_name, release_dt, isbn, price" +
-                        "   FROM books";
+                           "  FROM books";
+
+            // DataGridView 컨트롤 내 DataSource : DataTable 객체를 할당
             DgvBooks.DataSource = dbHelper.Select(query);
         }
     }
