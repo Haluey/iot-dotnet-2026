@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace DotNet06DbBooksApp
@@ -38,6 +39,19 @@ namespace DotNet06DbBooksApp
             adapter.Fill(dt);
 
             return dt;
+        }
+
+        // INSERT, UPDATE, DELETE 쿼리실행
+        public int Execute(string sql)
+        {
+            using (MySqlConnection conn = new MySqlConnection(connStr))
+            {
+                conn.Open();
+
+                using (MySqlCommand cmd = new MySqlCommand(sql, conn)){
+                    return cmd.ExecuteNonQuery();   // INSERT, UPDATE, DELETE 쿼리를 실행
+                }
+            }
         }
     }
 }
