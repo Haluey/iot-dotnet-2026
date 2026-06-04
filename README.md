@@ -689,8 +689,8 @@ IoT 개발자 닷넷 리포지토리(기본, 중급, 응용, 프로젝트)
                             </Rectangle.Effect>
                         </Rectangle>
                         <Label Content="{TemplateBinding Content}" 
-                    Foreground="White" FontSize="20" FontWeight="ExtraBold"
-                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                               Foreground="White" FontSize="20" FontWeight="ExtraBold"
+                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>
@@ -709,6 +709,208 @@ IoT 개발자 닷넷 리포지토리(기본, 중급, 응용, 프로젝트)
 ```
 
 ![alt text](image-24.png)
+
+### 데이터 바인딩
+
+- 현재 대부분 앱은 데이터 중심
+    - 데이터 저장소(DB, 파일시스템, 클라우드, OpenAPI 등)의 데이터를 가져와서 표시
+    - 신규, 변경, 저장소에 다시 저장
+
+- 바인딩 패턴
+    - Early Binding(static) - 컴파일 시점에서 바인딩 결정
+    - `Lazy Binding(dynamic)` - 런타임 시점에서 바인딩 결정
+
+- 바인딩 방법
+
+    ```xml
+    <TextBox Text="{Binding 속성값}">
+
+    <TextBox Text="{Binding Path=속성값}">
+
+    <!-- 컨트롤명에 속하는 속성값이 표시, 여기에 새 값을 입력하면 컨트롤이 상호작용 -->
+    <TextBox Text="{Binding Source={StaticResource 컨트롤명}, Path=속성값}">
+    ```
+
+- Slider와 ProgressBar 바인딩
+
+    ```xml
+    <Slider x:Name="SliderTest" Value="20"/>
+    <ProgressBar Value="{Binding Value, ElementName=SliderTest}"/>
+    ```
+
+- 바인딩 모드
+    | 모드 | 방향 | 내용 |
+    | :--: | :--: | :--- |
+    | OneTime | ViewModel(데이터) -> 화면(한 번만) | 고정 제목, 버전 정보, 회사명 |
+    | OneWay | ViewModel -> 화면(계속) | 시계, 주식 가격, 센서값, 상태표시 |
+    | OneWayToSource | 화면 -> ViewModel | 거의 사용안함. 스크롤위치 저장 |
+    | `TwoWay` | ViewModel <-> 화면 | WPF MVVM 핵심 |
+
+- 도구상자 컨트롤별 기본값
+    - TextBlock, Label, Rectangle, Image, ProgressBar는 OneWay, 나머지는 거의 TwoWay
+    - 컨트롤을 직접 사용하지 않는 것 - OneWay
+    - 컨트롤을 사용자가 사용하는 것 - `TwoWay`
+
+- WPF바인딩은 전통적인 WinForm 바인딩보다 코딩량(예외처리포함)이 적고 쉽게 구현가능
+
+- DataContext : 데이터를 찾아올 위치. 바인딩되는 데이터를 화면상에서 적용
+    - 어떤 객체에도 전부 할당가능
+
+- ItemsSource : 목록 컬렉션은 어느 컨트롤에 할당하는지
+
+#### DataGrid, ControlBinding 방식
+
+1. 필요 데이터 속성으로 생성
+
+    ```cs
+    public List<Employee> Employees { get; set; }  // employee 컬렉션 속성
+    public Employee SelectedEmployee { get; set; }
+
+    private void Page_Loaded(object sender, RoutedEventArgs e){
+        /*
+            생략
+        */
+        // 데이터 그리드 할당
+        this.DataContext = this;    // 코드비하인드 데이터를 화면으로 보내기
+    }
+    ```
+
+2. xaml 데이터 바인딩 작업
+
+    ```xml
+    <!-- UI 디자이너 작업시 아래 내용 코딩 -->
+    <DataGrid x:Name="DgrEmployees"
+              IsReadOnly="True" SelectionMode="Single"
+              ItemsSource="{Binding Employees}"
+              SelectedItem="{Binding SelectedEmployee}">
+    </DataGrid>
+
+    <GroupBox Header="상세정보"
+              DataContext="{Binding SelectedItem, ElementName=DgrEmployees}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <!-- 생략 -->
+            </Grid.RowDefinitions>
+
+            <TextBox Text="{Binding Id}"/>
+            <TextBox Text="{Binding Name}"/>
+            <!-- 생략 -->
+            <DatePicker Text="{Binding HireDate, Mode=TwoWay}"/>
+            <CheckBox IsChecked="{Binding IsActive}"/>
+        </Grid>
+    </GroupBox>
+    ```
+
+3. UI설계에 바인딩할 속성이 다 지정
+
+![alt text](image-25.png)
+
+#### ComboBox, ListBox 바인딩
+
+1. ItemsSource 바인딩 사용
+2. SelectedItem 속성 바인딩
+3. DataGrid와 사용법 동일
+
+### Modern Design 적용
+
+- UI 디자인 프레임워크 사용
+    - DevExpress, Syncfusion, Telerik 등 : 유료, 윈앱이 무겁게 실행
+    - [HandyControl](https://github.com/handyorg/handycontrol) :  무료
+    - [MaterialDesignInXamlToolkit](https://github.com/materialdesigninxaml/materialdesigninxamltoolkit) : 무료
+    - [MahApps](https://mahapps.com/) : 무료
+
+#### MahApps 적용
+
+- NuGet Package로 설치
+    - MahApps.Metro, MahApps.Metro.IconPacks
+
+    ![alt text](image-26.png)
+
+- NuGet Package Console에서 설치
+
+    ```powershell
+    PM> Install-Package MahApps.Metro
+    ```
+
+- App.xaml에 리소스 딕셔너리 추가
+
+    ```xml
+    <ResourceDictionary>
+        <ResourceDictionary.MergedDictionaries>
+            <!-- MahApps.Metro resource dictionaries. Make sure that all file names are Case Sensitive! -->
+            <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+            <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
+            <!-- Theme setting -->
+            <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Light.Blue.xaml" />
+        </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+    ```
+
+- MainWindow.xaml에 xmlns추가, Window 태그 MetroWindow로 변경
+
+    ```xml
+    <mah:MetroWindow x:Class="WpfBasic03UiApp.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+
+        xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+    ```
+- MainWindow.xaml.cs의 부모클래스 Window -> MetroWindow로 변경
+
+    ```cs
+    using MahApps.Metro.Controls;
+
+    namespace WpfBasic03UiApp
+    {
+        public partial class MainWindow : MetroWindow
+    ```
+
+![alt text](image-27.png)
+
+- 테마 : Light/Dark, 액센트 : Amber ~ Yellow 까지 23개
+    - App.xaml의 Theme setting 리소스를 Light.Blue.xaml -> Dark.Mauve.xaml 등으로 변경하고 재실행
+
+- MahApps.Metro가 제공하는 컨트롤 도구상자에서 드래그 사용
+
+- MahApps.Metro Helper 기능으로 사용자 편의성 증대
+
+    ```xml
+    <TextBox x:Name="TxtAuthor"
+             Grid.Row="1" Margin="5"
+             mah:TextBoxHelper.AutoWatermark="True"
+             mah:TextBoxHelper.Watermark="저자"
+             mah:TextBoxHelper.ClearTextButton="True"
+             mah:TextBoxHelper.UseFloatingWatermark="True"
+    />
+    <!-- UseFloatingWatermark 컨트롤 높이 조절 필요-->
+    ```
+
+- 컨트롤 스타일
+
+    ```xml
+    <Button x:Name="BtnNew" Width="100" Content="신규" Margin="5"
+        Style="{StaticResource MahApps.Styles.Button.Dialogs.Accent}"/>
+    ```
+
+- 데이터 그리드 정렬
+    - 왼쪽 정렬 : 일반 텍스트(길이 가변)
+    - 중앙 정렬 : 코드 종류(길이 동일)
+    - 오른쪽 정렬 : 숫자, 가격 등
+
+![alt text](image-28.png)
+
+#### DB연동 객체리스트
+
+- Connection
+- Command
+- DataAdapter
+- DataReader
+- DataTable
+
+### 리소스 디자인 추가
 
 #### Present(나중에)
 

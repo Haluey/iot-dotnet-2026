@@ -29,8 +29,10 @@
             <TextBlock Text="텍스트 블록 컨트롤(padding 없음"/>
             <TextBox Text="일반 텍스트박스 컨트롤"/>
             <PasswordBox Password="123456"/>
-            <Slider Minimum="0" Maximum="100" TickFrequency="10" Value="20"/>
-            <ProgressBar Minimum="0" Maximum="100" Value="50" Height="20"/>
+            
+            <Slider x:Name="SliderTest" Minimum="0" Maximum="100" TickFrequency="10" Value="20"/>
+            <ProgressBar Minimum="0" Maximum="100" Value="{Binding Value, ElementName=SliderTest}" Height="20"/>
+            
             <CheckBox Content="체크박스 컨트롤"/>
             <RadioButton Content="라디오버튼 컨트롤"/>
             <Button Content="버튼 컨트롤"/>
@@ -51,7 +53,8 @@
                        Fill="Red" Stroke="CadetBlue" StrokeThickness="5"
                        Canvas.Left="-10" Canvas.Top="-40"/>
             <Ellipse Width="100" Height="100" 
-                     Fill="GreenYellow" Stroke="Yellow" StrokeThickness="4"
+                     Fill="GreenYellow" Stroke="Yellow" 
+                     StrokeThickness="4" StrokeDashArray="5,2,2,2" StrokeDashCap="Round"
                      Canvas.Left="15" Canvas.Top="12"/>
         </Canvas>
 
