@@ -904,11 +904,85 @@ IoT 개발자 닷넷 리포지토리(기본, 중급, 응용, 프로젝트)
 
 #### DB연동 객체리스트
 
-- Connection
-- Command
-- DataAdapter
-- DataReader
-- DataTable
+- DataBase와 C# 간의 연동에 필요한 객체 및 변수
+    - ConnectionString : DB연결 문자열. DB종류마다 포맷과 키값이 다름
+
+        ```cs
+        // 포트 지정이 필요한 경우 (기본값: 3306)
+        // localhost : 127.0.0.1
+        Server=서버IP;Port=3306;Database=DB이름;Uid=유저명;Pwd=비밀번호;
+        // 또는
+        Server=서버IP;Database=DB이름;User ID=유저명;Password=비밀번호;Charset=utf8;
+        ```
+    - query : DB에서 실행할 쿼리작성 문자열
+
+    - 각 DB별 외부패키지 NuGet에서 설치
+
+    - `Connection` : DB연결 객체, 생성 시 DB연결 문자열이 필요
+    - `Command` : 쿼리를 컨트롤하는 객체, MySQLCommand. 생성 시 쿼리문, Connection 객체 필요
+        - ExecuteNonQuery() : INSERT, UPDATE, DELETE 명령 실행
+        - ExecuteReader() : SELECT 명령 실행, 데이터 읽어오고 반복문으로 직접 제어
+        - ExecuteScalar() : COUNT 함수처럼 1개 값만 리턴되는 쿼리 실행
+    - `Parameter` : 쿼리 WHERE절 등에 들어가는 파라미터(@컬럼명)를 지정하는 객체
+    - `DataAdapter` : Command 객체를 자동으로 반복문 처리해주는 객체
+        - ExecuteReader()로 생성된 결과는 수동으로 반복문 처리
+        - 각 데이터별 조작이 필요할 때 불편하다는 단점이 있음
+    - `DataReader` : ExecuteReader()로 생성된 결과를 담는 객체
+
+    -  여기까지 Sql, MySQL, Oracle 등 DB 종류별로 Prefix가 붙음
+
+    - DataTable : DataAdapter로 생성된 데이터를 담는 공통 객체
+
+#### 콤보박스 바인딩
+
+![alt text](image-29.png)
+
+```xml
+<ComboBox 
+    x:Name="CboDivCode" Grid.Row="2" Margin="5"
+    SelectedValuePath="div_code"
+    DisplayMemberPath="div_name"/>
+```
+
+![alt text](image-30.png)
+
+#### 입력값 검증
+
+- 실무에서 DB에 데이터 입력 전에 가장 중요한 부분
+- 입력값 검증을 제대로 해야 DB에 잘못된 데이터가 저장되지 않음
+
+```cs
+// Validation Check
+if (string.IsNullOrEmpty(author) || string.IsNullOrEmpty(bookName) || string.IsNullOrEmpty(divCode))
+{
+    await this.ShowMessageAsync("입력 오류", "필수 값을 입력하세요");
+    return;
+}
+
+//DateTime releaseDt = DateTime.Parse(DtpReleaseDt.Text); // 예외발생
+// TryParse(가져올 값 변수, out 담을변수) 메서드. 예외발생하지 않음
+if (!DateTime.TryParse(DtpReleaseDt.Text, out DateTime releaseDt))
+{
+    await this.ShowMessageAsync("입력 오류", "날짜 형식이 올바르지 않습니다");
+    return;
+}
+
+// 가격도 TryParse
+if (!int.TryParse(TxtPrice.Text, out int price))
+{
+    await this.ShowMessageAsync("입력 오류", "가격은 숫자로 입력하세요");
+    return;
+}
+```
+
+- 실행화면
+
+    ![alt text](image-31.png)
+
+- [xaml](./winapp/IotWpfSolutions/WpfBasic04DbApp/MainWindow.xaml)
+- [소스](./winapp/IotWpfSolutions/WpfBasic04DbApp/MainWindow.xaml.cs)
+
+## 데스크톱앱에서
 
 ### 리소스 디자인 추가
 
@@ -916,17 +990,25 @@ IoT 개발자 닷넷 리포지토리(기본, 중급, 응용, 프로젝트)
 
 - 컨트롤의 실제 내용을 화면에 표시하는 자리
 
+### 키오스크 앱
+
+- 결제 이전까지 동작하는 버전
+- WPF를 사용해서 구현
+
 ### OpenAPI연동 앱
 
 - 미세먼저 모니터링 앱
 - 국가 교통정보 CCTV뷰 앱
 - IoT 모니터링 앱
 
-### 키오스크 앱
-
-- 결제 이전까지 동작하는 버전
-- WPF를 사용해서 구현
+### 스마트홈 앱
+- ??
 
 ### 라이브러리 만들기
+
+### Essential Pathway 학습
+
+### 게임 프로젝트
+- ??
 
 ### 유니티 디지털트윈
