@@ -959,6 +959,7 @@ if (!int.TryParse(TxtPrice.Text, out int price))
 ```
 
 - 실행화면
+
     ![alt text](image-31.png)
 
 - [xaml](./winapp/IotWpfSolutions/WpfBasic04DbApp/MainWindow.xaml)
