@@ -109,6 +109,7 @@ https://github.com/user-attachments/assets/71a66993-b2c5-4dda-90c4-93534e6f6e6e
 - [X] 메인창에서 옵션창으로 MenuId 전달
 - [ ] DB 연동!! 로딩 메뉴 SELECT / 주문내역 INSERT
 - [X] 메뉴 동적 바인딩!!
+- [ ] DB저장 후 신용카드 결제 팝업(더미)
 
 #### 옵션창 주문내역 확인
 
@@ -121,5 +122,31 @@ https://github.com/user-attachments/assets/71a66993-b2c5-4dda-90c4-93534e6f6e6e
 #### 실행결과
 
 https://github.com/user-attachments/assets/041efd61-0fc9-421a-9cfe-0ac99181ddad
+
+#### 로그확인 방법
+
+- 프로젝트 속성 > 출력유형
+
+    ![alt text](image-39.png)
+
+- Windows 애플리케이션 -> 콘솔 애플리케이션으로 변경
+- MessageBox.Show() 대신 Console.WriteLine()메서드로 변경
+
+  ![alt text](image-38.png)
+- 실행로그 확인
+
+#### DB 주문내역 등록
+
+- DatabaseHelper에 INSERT 처리 메서드 생성
+- MainWindow.xaml.cs에 저장쿼리 실행 메서드 생성
+- BtnPay_Click 이벤트 핸들러에 저장 메서드 추가
+
+#### 최종 작업
+
+- 프로젝트 속성 > 출력 유형, Windows 애플리케이션으로 변경
+- 구성관리자 Debug -> Release로 변경 빌드
+- 배포...
+
+#### 전체 실행결과
 
 ### OPENAPI 연동앱 개발

@@ -18,33 +18,31 @@ IoT 개발자 닷넷 리포지토리(기본, 중급, 응용, 프로젝트)
 - JAVA는 버츄얼머신(VM) 위에서 동작
 - C#은 닷넷프레임워크(VM) 위에서 동작
 - .NET(dotNET) 프레임워크의 구조를 따르면 무슨 언어든지 동작 가능
-  - C#, VisualBasic, J#, F#, C++.NET, Python 등
+    - C#, VisualBasic, J#, F#, C++.NET, Python 등
 
 ![alt text](image.png)
 
 - 출처 : https://wikidocs.net/227163
 - 버전 명칭
-
-  - .NET Framework > .NET Core > .NET 5.0이상
+    - .NET Framework > .NET Core > .NET 5.0이상
 
 ### 절차적 프로그래밍 VS 객체지향 프로그래밍
 
 - 절차적 : 순서대로 수행하도록 프로그래밍을 구현하는 것
 - 객체지향 : 모든 것을 객체로 선언해서 메서드로 동작, 각 객체별로 메시지를 전달하는 형태로 프로그래밍을 구현하는 것
-
-  - 포괄적 의미 : 절차적 프로그래밍을 하면서 객체를 최대한 사용하는 방식
+    - 포괄적 의미 : 절차적 프로그래밍을 하면서 객체를 최대한 사용하는 방식
 
 ### C# 개발 분야
 
 - 윈도우 프로그램 : 윈 앱(Application -> App)
+    - 아직 완벽하게 멀티프랫폼이 안됨
 
-  - 아직 완벽하게 멀티프랫폼이 안됨
 - 웹 앱 : ASP(Active Server Page).NET <---> Spring(Java Server Page)
+    - MacOS, Linux, Windows 모두 가능
 
-  - MacOS, Linux, Windows 모두 가능
 - 유니티 : 게임, 디지털트윈(산업계)
+    - 크로스플랫폼(MacOS, Linux, Windows, Mobile(Android, iOS))
 
-  - 크로스플랫폼(MacOS, Linux, Windows, Mobile(Android, iOS))
 - IoT 연동 : 아두이노, 라즈베리파이 가능
 
 ### C# 언어 난이도
@@ -943,8 +941,8 @@ if (!int.TryParse(TxtPrice.Text, out int price))
 ```
 
 - 실행화면
+    ![alt text](image-31.png)
 
-  ![alt text](image-31.png)
 - [xaml](./winapp/IotWpfSolutions/WpfBasic04DbApp/MainWindow.xaml)
 - [소스](./winapp/IotWpfSolutions/WpfBasic04DbApp/MainWindow.xaml.cs)
 
@@ -956,10 +954,6 @@ if (!int.TryParse(TxtPrice.Text, out int price))
 
 - 컨트롤의 실제 내용을 화면에 표시하는 자리
 
-### 키오스크 앱
-
-- 결제 이전까지 동작하는 버전
-- WPF를 사용해서 구현
 
 ### OpenAPI연동 앱
 
