@@ -316,12 +316,85 @@ https://github.com/user-attachments/assets/785bdb5c-b742-4cec-958a-0c760556e00c
 
 #### 추가 작업
 
-- [ ] NLog 로그 처리
-- [ ] MahApps.Metro.IconPacks 사용
+- [X] NLog 로그 처리
+- [X] MahApps.Metro.IconPacks 사용
+- [X] 페이지번호, 결과수 파라미터 사용 검색
+- [X] 데이터그리드 포커스 색상 반전
+- [X] 기타 예외처리
+- [X] 데이터그리드 레코드 더블클릭시 상세정보 및 지도 팝업
+- [X] 상세정보의 상세내용 HTML 태그 삭제
+- [X] 상태표시줄 로드완료 메시지 출력
+- [X] 상세정보 홈페이지 띄우기
 - [ ] 비동기 메서드 수정
-- [ ] 페이지번호, 결과수 파라미터 사용하기
-- [ ] 검색버튼 기능
-- [ ] 데이터그리드 포커스 색상 반전
-- [ ] 데이터그리드 레코드 클릭시 상세 팝업
-- [ ] 데이터그리드 레코드 더블클릭시 지도 팝업
-- [ ] 기타 예외처리
+
+#### NuGet 패키지
+
+- 느낌표 아이콘이 뜨면 패키지 사용이 거의 불가
+
+![alt text](image-46.png)
+
+#### NLOG
+
+- .NET 앱용 로깅 라이브러리
+- 이전 log4j.net 자바라이브러리를 C#용으로 수정한 라이브러리 사용
+- MessageBox.show(), Console.WriteLine() 디버깅 후에 주석처리 또는 삭제
+- 로그를 파일이나 DB에 저장하는 형태로 사용 가능
+
+##### NuGet 패키지에서 설치
+
+##### NLOG.config 설정
+
+- 프로젝트 최상위 폴더에서 xml파일로 NLog.config를 생성 
+
+- 아래와 같이 작성
+
+    ```xml
+    <?xml version="1.0" encoding="utf-8" ?>
+    <nlog xmlns="http://www.nlog-project.org/schemas/NLog.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.nlog-project.org/schemas/NLog.xsd NLog.xsd">
+
+        <targets>
+            <target name="logfile" xsi:type="File" fileName="logfile.txt" />
+            <target name="logconsole" xsi:type="Console" />
+        </targets>
+
+        <rules>
+            <logger name="*" minlevel="Info" writeTo="logconsole" />
+            <logger name="*" minlevel="Debug" writeTo="logfile" />
+        </rules>
+    </nlog>
+    ```
+
+- NLog.config 파일 속성 > `빌드 작업 : 내용(컨텐츠)`, `출력 디렉터리로 복사: 항상 복사` 변경 후 빌드
+
+##### NLog 사용법
+
+```cs
+// NLog 기본 객체 생성방법
+private readonly Logger logger = LogManager.GetCurrentClassLogger();
+
+logger.Info("부산 페스티벌 정보앱 시작.");
+logger.Trace("트레이스");
+logger.Debug("디버그");
+logger.Warn("경고");
+logger.Error("예외발생");
+logger.Fatal("매우 중대한 오류");
+```
+
+##### Common 클래스 생성
+
+```cs
+public static readonly Logger logger = LogManager.GetCurrentClassLogger();
+```
+
+#### WinForms, WPF 기본 웹브라우저 컨트롤 문제
+
+- HTML렌더링 엔진이 최신 스크립트를 지원하지 않음
+
+    ![alt text](image-47.png)
+
+- CefSharp.WPF 라이브러리 사용
+
+#### 완성 실행결과
+
+
