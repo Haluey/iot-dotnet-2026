@@ -325,7 +325,31 @@ https://github.com/user-attachments/assets/785bdb5c-b742-4cec-958a-0c760556e00c
 - [X] 상세정보의 상세내용 HTML 태그 삭제
 - [X] 상태표시줄 로드완료 메시지 출력
 - [X] 상세정보 홈페이지 띄우기
-- [ ] 비동기 메서드 수정
+- [X] 비동기 메서드 수정
+
+#### C# 코딩방식 변경
+
+- 좀 더 효율적인 코딩방식 채택
+
+```cs
+// 1번 예전 C# 방식
+if (response != null && 
+    response.FestivalData != null &&
+    response.FestivalData.Items != null)
+{
+    return response.FestivalData.Items;
+}
+else
+{
+    return new ObservableCollection<FestivalItem>();    // 빈 리스트
+}
+
+// 2번 좀 더 최근 C# 방식
+return response?.FestivalData?.Items?? new ObservableCollection<FestivalItem>();
+```
+
+- ?. response가 null이면 null을 반환, 아니면 response.FestivalData로 진입
+- ?? 객체가 null이면 ?? 다음의 객체로 반환
 
 #### NuGet 패키지
 
@@ -395,6 +419,79 @@ public static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
 - CefSharp.WPF 라이브러리 사용
 
+#### 추가 개발 건
+
+- [ ] (하) 결과수에서 값을 변경하고 엔터키를 누르면 바로 검색
+- [ ] (하) 전체 데이터 수를 넘어서는 페이지번호, 결과수 제약
+- [ ] (하) 웹사이트 링크대신 아이콘 버튼으로 변경
+- [ ] (하) MIDDLE_SIZE_RM1 장애인 정보 표현
+- [ ] (중) HTML 삭제 대신 CefSharp.WPF브라우저로 HTML 렌더링
+- [ ] (상) 유튜브 검색결과와 연동, 링크누르면 유튜브 실행
+- [ ] (상) 구글맵 API 사용해서 구글맵 표현
+
+#### 데이터포털 부산 API 활용방법
+
+- 축제정보와 거의 동일한 서비스
+    - 부산광역시_부산맛집정보 서비스
+    - 부산광역시_부산명소정보 서비스
+    - 부산광역시_부산테마여행정보 서비스
+    - 부산광역시_부산도보여행정보 서비스
+    - 부산광역시_부산쇼핑정보 서비스
+
+- 유사한 서비스
+    - 부산광역시_공연장 목록 서비스
+    - 부산광역시_갈맷길 코스 정보 서비스
+    - 부산광역시_구군 모범음식점 현황
+
+- 관광공사에서 API를 신규발급 서비스
+    - 부산관광공사_부산 음식테마거리
+    - 부산관광공사_부산 7beach 음식관광
+
+
 #### 완성 실행결과
 
 https://github.com/user-attachments/assets/cbe4d2c7-c1db-4f42-a3b4-49f4ab1bc655
+
+### 1-3. SmartHome 솔루션
+
+#### MQTT
+
+- Message Queuing Telemetry Transport 프로토콜 명칭
+
+- IoT 장치간에 데이터를 주고받을 수 있도록 개발
+
+- ISO/IEC 20922 국제 표준
+
+- 발행-구독(Publish-Subscribe) 기반
+    - Apache Kafka : Java, Spring Boot
+    - ROS2 DDS : 로봇
+    - MQTT : IoT, 스마트팩토리
+    - RabbitMQ : 기업메시징
+    - SignalR : 실시간 웹
+    - WebSocket 브로드캐스트 : 실시간 웹
+
+- 소켓통신, TCP/IP기반
+
+- MQTT 동작방식
+
+    ![alt text](image-48.png)
+
+- MQTT 시스템 구성도
+
+    ![alt text](image-49.png)
+
+#### WPF SmartHome 프로젝트
+
+- Dummy Sensing Data 생성, 송신 시뮬레이터 앱 구현
+- MQTT 브로커 설치 및 설정
+- SmartHome 모니터링 앱 구현
+
+#### MQTT 브로커
+
+#### Dummy Simulator 앱
+
+#### SmartHome 모니터링 앱
+
+
+
+### MVVM은 나중에

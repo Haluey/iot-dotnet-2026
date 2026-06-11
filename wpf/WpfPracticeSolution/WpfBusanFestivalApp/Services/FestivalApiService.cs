@@ -30,7 +30,7 @@ namespace WpfBusanFestivalApp.Services
             if (ServiceKey == null)
             {
                 Common.logger.Warn("공공데이터 포털 API가 없습니다.");
-                return null;
+                return new ObservableCollection<FestivalItem>();
             }                
 
             string serviceUrl = $"https://apis.data.go.kr/6260000/FestivalService/getFestivalKr" +
@@ -49,12 +49,29 @@ namespace WpfBusanFestivalApp.Services
                 // 역직렬화로 데이터 변환 필요
                 FestivalResponse? response = JsonConvert.DeserializeObject<FestivalResponse>(json);
 
-                return response.FestivalData.Items;
+                //return response.FestivalData.Items;
+
+                // 1번 예전 C# 방식
+                /*
+                if (response != null && 
+                    response.FestivalData != null &&
+                    response.FestivalData.Items != null)
+                {
+                    return response.FestivalData.Items;
+                }
+                else
+                {
+                    return new ObservableCollection<FestivalItem>();    // 빈 리스트
+                }
+                */
+
+                // 2번 좀 더 최근 C# 방식
+                return response?.FestivalData?.Items?? new ObservableCollection<FestivalItem>();
             }
             catch (Exception ex)
             {
                 Common.logger.Error($"예외발생 : {ex.Message}");
-                return null;
+                return new ObservableCollection<FestivalItem>();
             }
         }
     }
