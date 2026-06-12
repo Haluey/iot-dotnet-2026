@@ -24,7 +24,7 @@
                    Height="28"
                    Foreground="White">
             <StatusBarItem>
-                <TextBlock Text="데이터포털 API 활용앱"/>
+                <TextBlock Text="데이터포털 API 활용앱 v1.5"/>
             </StatusBarItem>
             <Separator Background="White"/>
             <StatusBarItem>
