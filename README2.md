@@ -624,7 +624,9 @@ Adding password for user root
 
 ##### 실행화면
 
+https://github.com/user-attachments/assets/bfbe2cab-0697-4dbb-a00a-d68d98e7e2be
 
+---
 
 #### MQTT Subscribe 앱
 
@@ -633,7 +635,7 @@ Adding password for user root
 
 ##### 구독 실행화면
 
-
+https://github.com/user-attachments/assets/af289803-423a-4a0b-92a1-8b43e9838537
 
 #### SmartHome 모니터링 앱
 
