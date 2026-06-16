@@ -658,6 +658,8 @@ CREATE TABLE sensor_data
 
 ##### DB 저장 확인
 
+![alt text](image-57.png)
+
 ![alt text](image-56.png)
 
 ---
@@ -668,9 +670,4 @@ CREATE TABLE sensor_data
 
 ### MVVM은 나중에
 
-
-## 2.Unity 실습
-
-### 2-1. Essential PathWay
-
-### 2-2. Unity Factory
+[다음](./README3.md)

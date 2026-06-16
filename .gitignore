@@ -535,3 +535,6 @@ InitTestScene*.unity*
 
 # Auto-generated cache in Assets folder
 **/[Aa]ssets/[Ss]ceneDependencyCache*
+
+# 튜토리얼 폴더는 github 업로드 제외
+**/[Aa]ssets/Tutorials/
