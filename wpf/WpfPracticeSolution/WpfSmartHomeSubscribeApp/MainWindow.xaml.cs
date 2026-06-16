@@ -7,6 +7,10 @@ using MahApps.Metro.Controls.Dialogs;
 using WpfSmartHomeSubscribeApp.Helpers;
 using MQTTnet;
 using System.Text;
+using WpfSmartHomeSubscribeApp.Models;
+using System.Text.Json;
+using WpfSmartHomeSubscribeApp.Commons;
+using MySqlConnector;
 
 namespace WpfSmartHomeSubscribeApp
 {
@@ -32,6 +36,8 @@ namespace WpfSmartHomeSubscribeApp
         private string DbUser { get; set; } = "root";
         private string DbPassword { get; set; } = "my123456";
         private string DbName { get; set; } = "smarthome";
+
+        private DatabaseHelper db;
 
         #endregion
 
@@ -176,6 +182,8 @@ namespace WpfSmartHomeSubscribeApp
                 string payload = Encoding.UTF8.GetString(e.ApplicationMessage.Payload);
 
                 AddLogs(topic, payload);
+
+                await SaveSensorDataAsync(payload);
             };
 
             var options = new MqttClientOptionsBuilder()
@@ -196,7 +204,62 @@ namespace WpfSmartHomeSubscribeApp
             // Subscribe를 실행
             await MqttClient.SubscribeAsync(subscribeOptions);
 
+            // DB 설정
+            db = new DatabaseHelper();
+            db.connStr = $"Server={DbHost};" +
+                         $"Port=3306;" +
+                         $"Database={DbName};" +
+                         $"User ID={DbUser};" +
+                         $"Password={DbPassword};" +
+                         $"Charset=utf8mb4;";
+
             AddLogs("SYSTEM", "MQTT 구독 시작!");
+        }
+
+
+        /// <summary>
+        /// Subscribe 데이터 DB저장
+        /// </summary>
+        /// <param name="payload"></param>
+        /// <returns></returns>
+        private async Task SaveSensorDataAsync(string payload)
+        {
+            try
+            {
+                // JSON 역직렬화
+                List<SensorData> sensors = JsonSerializer.Deserialize<List<SensorData>>(payload);
+            
+                if (sensors == null || sensors.Count == 0)
+                {
+                    AddLogs("ERROR", "수신된 데이터가 없습니다.");
+                    return;
+                }
+
+                await using var conn = new MySqlConnection(db.connStr);
+                await conn.OpenAsync();
+
+                foreach (var sensor in sensors)
+                {
+                    string query = $@"INSERT INTO smarthome.sensor_data
+                                      (home_id, room_name, sensing_datetime, temp, humid, created_at)
+                                      VALUES(
+                                        '{sensor.HomeId}', 
+                                        '{sensor.RoomName}', 
+                                        '{sensor.SensingDateTime}', 
+                                        {sensor.Temp}, {sensor.Humid}, 
+                                        CURRENT_TIMESTAMP);";
+
+                    await using var cmd = new MySqlCommand(query, conn);
+
+                    await cmd.ExecuteNonQueryAsync();
+                }
+
+                AddLogs("DB", $"{sensors.Count}건 DB저장 완료!");
+            }
+            catch (Exception ex)
+            {
+                AddLogs("ERROR", ex.Message);
+            }
         }
 
         #endregion

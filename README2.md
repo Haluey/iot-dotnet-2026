@@ -637,9 +637,34 @@ https://github.com/user-attachments/assets/bfbe2cab-0697-4dbb-a00a-d68d98e7e2be
 
 https://github.com/user-attachments/assets/af289803-423a-4a0b-92a1-8b43e9838537
 
+##### NuGet 패키지 설치
+
+- MySqlConnector 추가
+
+##### DB 테이블 생성
+
+```sql
+CREATE TABLE sensor_data
+(
+    sensor_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    home_id VARCHAR(50) NOT NULL,
+    room_name VARCHAR(50) NOT NULL,
+    sensing_datetime DATETIME NOT NULL,
+    temp DOUBLE NOT NULL,
+    humid DOUBLE NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+##### DB 저장 확인
+
+![alt text](image-56.png)
+
+---
+
 #### SmartHome 모니터링 앱
 
-- MQTT Subscribe 구현
+- MQTT Subscribe 기능
 
 ### MVVM은 나중에
 
