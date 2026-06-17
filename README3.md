@@ -164,6 +164,293 @@
 
 ![alt text](image-77.png)
 
+#### Audio Effect
+
+- 냄비 프리팹 선택 후 가스레인지 위 위치
+- Audio Source 컴포넌트 추가
+- Audio Generator 선택 후 Loop 체크
+- Spatial Blend : 2D -> 3D 
+
+![alt text](image-80.png)
+
+#### Unity 오브젝트 복사
+
+- Ctrl + D : 선택한 오브젝트 바로 복사
+
+#### 단축키
+
+- 메뉴 Edit > Shortcuts
+
+    ![alt text](image-81.png)
+
+#### 배경음악, 새소리
+
+- 계층창에서 Audio Source 선택
+
+- 알맞은 사운드 Audio Generator에서 선택
+
+- 시작하면서 바로 음악 플레이하고 싶으면
+    - Play on Awake 체크
+
+- 새소리처럼 랜덤하게 플레이하고 싶으면
+    - Play on Awake 체크 해제
+    - PlaySoundAtRandomIntervals 스크립트 추가
+    - Min/Max Seconds에 랜덤시간 지정
+
+#### Programming
+
+- 유니티 개발 시 가장 핵심!
+
+- Player 오브젝트 위치, 회전, 크기 조정
+
+- PlayerController 스크립트 생성 후 Player에 드래그
+
+- 입력시스템 변경
+    - Project Settings > Player > Other Settings > `Active Input Handling`을 Old 또는 `Both`로 변경 후 에디터 재시작
+
+#### 카메라 플레이어 Child 지정
+
+- Main Camera, Player 하위에 드래그
+- 카메라 위치 Reset 후 위치, 회전 수정
+
+![alt text](image-82.png)
+
+- 방 아래 Cube까지 화면에 출력될 경우 위치 조정 잘해줘야 플레이 시 카메라 진동 X
+
+#### 플레이모드 변수값 변경
+
+- Speed : 5.0f, RotationSpeed : 120.0f
+- 플레이 시 이동속도가 빠름
+- 플레이모드 변수값 수정하면서 알맞은 속도 확인
+- Speed : 0.3f, RotationSpeed : 70.0f 이 적당함
+- Inspector에 지정된 스크립트 리셋
+
+![alt text](image-83.png)
+
+#### 아이템 코인 오브젝트
+
+- Prefabs 폴더에서 Collectible Coin 드래그, 위치, 사이즈 조정
+- Collectable.cs 스크립트 생성
+
+```cs
+using UnityEngine;
+
+public class Collectable : MonoBehaviour
+{
+    [Header("회전 설정")]
+    [Tooltip("프레임당 회전 속도")]
+    [Range(0, 10)]
+    public float rotationSpeed = 0.5f;
+
+    [Tooltip("아이템 획득시 이펙트 지정")]
+    public GameObject collectEffect;
+
+    // Update is called once per frame
+    void Update()
+    {
+        transform.Rotate(0, rotationSpeed, 0);  // 매 프레임마다 y축을 0.5f씩 회전
+    }
+
+    // 물체끼리 충돌이 발생했을 때 이벤트 처리
+    private void OnTriggerEnter(Collider other)
+    {
+        Destroy(gameObject);    // 코인 삭제
+
+        Instantiate(collectEffect, transform.position, transform.rotation);
+    }
+}
+```
+
+![alt text](image-84.png)
+
+#### 아이템 획득 기능 추가
+
+- Coin에 Box Colider > `Is Trigger` 체크
+- 충돌은 발생하지 않고, 충돌감지 기능 활성화
+
+![alt text](image-85.png)
+
+- Collectable.cs에 onTriggerEnter 메서드 추가
+
+#### 점프 기능 추가
+
+- PlayController.cs에 공용변수, Update() 추가
+
+```cs
+[Tooltip("점프 강도")]
+public float jumpForce = 5.0f;
+
+// 입력처리, 카메라, ... Frame별 실행
+// LateUpdate() : Update() 후에 실행되는 메서드. 카메라 추적
+private void Update()
+{
+    if (Keyboard.current.spaceKey.wasPressedThisFrame)
+    {
+        rb.AddForce(Vector3.up * jumpForce, ForceMode.VelocityChange);
+    }
+}
+```
+
+![alt text](image-86.png)
+
+- Play 후 Space 누르면 점프 확인
+
+#### 생성형 AI 활용 밤낮처리 추가
+
+- 프롬포트로 요청
+```text
+유니티에서 Directional Light를 조정해서 밤낮으로 바뀌는 스크립트를 작성해줘. 20초에 한번씩 해가지고 다시 뜨도록 만들어줘. DayNightCycle.cs로 만들어줘
+```
+
+```cs
+using UnityEngine;
+
+public class DayNightCycle : MonoBehaviour
+{
+    [Header("Directional Light")]
+    public Light sun;
+
+    [Header("Cycle Settings")]
+    [Tooltip("낮→밤→낮 한 바퀴 도는 시간(초)")]
+    public float cycleDuration = 20f;
+
+    private float currentTime;
+
+    private void Update()
+    {
+        if (sun == null) return;
+
+        // 시간 증가
+        currentTime += Time.deltaTime;
+
+        // 0 ~ 1 반복
+        float normalizedTime = (currentTime % cycleDuration) / cycleDuration;
+
+        // 0 ~ 360도 회전
+        float sunAngle = normalizedTime * 360f;
+
+        transform.rotation = Quaternion.Euler(sunAngle - 90f, 170f, 0f);
+
+        // 빛 세기 조절
+        float intensity = Mathf.Clamp01(
+            Mathf.Cos((normalizedTime - 0.25f) * Mathf.PI * 2f)
+        );
+
+        sun.intensity = intensity;
+    }
+}
+```
+
+- Directional Light 오브젝트에 할당
+- 변수 Sun에 Directional Light 할당
+
+![alt text](image-87.png)
+
+- Tutorial 스크립트
+
+```cs
+[Header("회전 속도 설정")]
+public float rotationSpeed = 1f;
+
+[Header("시간 설정")]
+[Tooltip("하루(24시간)가 지나는데 걸리는 실제 시간(초)")]
+public float dayDuration = 60f;
+
+private float timePassed = 0.0f;
+
+void Start()
+{
+    rotationSpeed = Mathf.Abs(rotationSpeed);
+}
+
+void Update()
+{
+    float angleToRotate =
+        (360.0f / dayDuration) * Time.deltaTime;
+
+    transform.Rotate(
+        Vector3.right,
+        angleToRotate * rotationSpeed);
+
+    timePassed += Time.deltaTime;
+
+    if (timePassed >= dayDuration)
+    {
+        timePassed = 0.0f;
+    }
+}
+```
+
+TODO - 이미지 추가
+
+#### 방문 열기 기능
+
+- DoorOpener.cs생성
+- Door 루트오브젝트에 스크립트 지정
+- Box Collider 추가 Is Trigger 체크 후 위치, 크기 수정
+- 튜토리얼에 있는 스크립트 붙여넣기
+- Player 객체에 Tag 콤보박스에서 `Player` 태그를 선택
+
+![alt text](image-88.png)
+
+#### 코인 획득 사운드 추가
+
+- Collectable.cs에 소스 추가
+
+```cs
+[Header("이펙트 사운드")]
+public AudioClip pickupSound;
+
+// 물체끼리 충돌이 발생했을 때 이벤트 처리
+private void OnTriggerEnter(Collider other)
+{
+    if (other.CompareTag("Player"))
+    {
+        AudioSource.PlayClipAtPoint(pickupSound, transform.postion);    // 뾰롱소리
+
+        Destroy(gameObject);    // 코인 삭제
+
+        Instantiate(collectEffect, transform.position, transform.rotation); // 파티클 이펙트 실행
+    }
+}
+```
+
+- prefab의 코인을 선택 후 Script 내 pickupSound 설정
+
+![alt text](image-89.png)
+
+#### 배포하기
+
+- UI(Canvas) 메뉴에서 선택
+
+![alt text](image-90.png)
+
+#### 빌드 시 사용할 신리스트 설정
+
+- 메뉴 > File > Build Profiles
+- 필요한 씬을 Scene List에 추가
+
+![alt text](image-91.png)
+
+- 플레이어 셋팅 작업
+    - Company Name, Product Name, Version, Default Icon
+    - Resolution > Windowed, Width, Height 설정
+
+![alt text](image-92.png)
+
+- Build Profiles > Build 또는 Build And Run 버튼 클릭 빌드 진행
+
+![alt text](image-93.png)
+
+![alt text](image-94.png)
+
+- 메뉴 클릭 Scene 이동, ESC키로 메뉴 리턴
+
+- 유니티 UI Camvus > Button Inspector 속성
+- On Click 이벤트
+
+![alt text](image-95.png)
+
 ---
 
 ### 2-3. Unity Factory
@@ -186,7 +473,7 @@
     - InputSystem 오류
         - 키보드, 마우스 입력 시스템이 Unity 6부터 변경
         - 예전 방식 입력시스템 사용
-        - Project Settings > Player > Other Settings > Active Input Handling을 Old 또는 Both로 변경 후 에디터 재시작
+        - Project Settings > Player > Other Settings > `Active Input Handling`을 Old 또는 `Both`로 변경 후 에디터 재시작
 
     TODO - 비활성화하기 전 이미지추가
 
