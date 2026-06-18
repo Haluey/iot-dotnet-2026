@@ -272,6 +272,10 @@ public class Collectable : MonoBehaviour
 
 - Collectable.cs에 onTriggerEnter 메서드 추가
 
+#### 실행화면
+
+https://github.com/user-attachments/assets/bcf01f87-cd24-4f25-9590-164d4d6bc289
+
 #### 점프 기능 추가
 
 - PlayController.cs에 공용변수, Update() 추가
@@ -614,6 +618,8 @@ public class BoxSpawner : MonoBehaviour
 - Spawner 빈오브젝트에 스크립트 할당
 
 #### 실행결과
+
+https://github.com/user-attachments/assets/a562599f-92e3-4811-8c33-7a24ede90116
 
 
 
