@@ -779,7 +779,7 @@ https://github.com/user-attachments/assets/366a500d-6c6d-4194-8aaf-404ec9cf9f02
 
 - Unity에서 건물을 손쉽게 만들 수 있도록 도와주는 패키지
 - 3D 모델링 기능이 없는 Unity를 Blender처럼 모델링할 수 있도록 지원
-- 단, 
+- 단, Blender 만큼 강력하지는 않음
 
 #### 설치
 
