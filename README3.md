@@ -520,6 +520,10 @@ private void OnTriggerEnter(Collider other)
 
 ![alt text](image-100.png)
 
+---
+
+### 2-3. 생산라인 구축
+
 #### 생산품 박스
 
 - Cube 오브젝트로 생성
@@ -621,16 +625,245 @@ public class BoxSpawner : MonoBehaviour
 
 https://github.com/user-attachments/assets/a562599f-92e3-4811-8c33-7a24ede90116
 
+#### 컨베이어 벨트 여러개 구성
+
+- 프리팹 드래그 추가
+
+#### 컨베이어 벨트 멈추기 기능
+
+- ConveyorBelt.cs 열기
+- 로직 변경
+
+```cs
+using UnityEngine;
+
+public class ConveyorBelt : MonoBehaviour
+{
+    ...
+    [Header("벨트 동작여부")]
+    public bool isRunning = true;
+
+    private void OnCollisionStay(Collision collision)
+    {
+        Rigidbody rb = collision.rigidbody;
+
+        if (rb == null) return;
+
+        if (!isRunning)
+        {
+            rb.linearVelocity = Vector3.zero;   // 0으로 초기화
+            return;
+        }
+
+        rb.linearVelocity = moveDirection.normalized * speed;
+    }
+
+    public void StopBelt()
+    {
+        isRunning = false;  // 중지
+    }
+
+    public void StartBelt()
+    {
+        isRunning = true;   // 재시작
+    }
+}
+```
+
+- 벨트 동작여부 체크 확인
+
+    ![alt text](image-104.png)
+
+- 컨베이어 끝에 센서가 있다고 가정. Collider 트리거 발생하면 멈춤기능
+
+- 빈 오브젝트 생성 > `Sensor` 명명
+
+- Sensor 오브젝트 > `BoxCollider `컴포넌트 추가. `Is Trigger` 체크
+
+- `Edit Collider` 아이콘 클릭 후 위치, 크기 조정
+
+![alt text](image-105.png)
+
+- SensorTrigger.cs 스크립트 생성
+
+```cs
+using UnityEngine;
+
+public class SensorTrigger : MonoBehaviour
+{
+    // 다른 Collider가 들어와서 Trigger가 발생하면
+    private void OnTriggerEnter(Collider other)
+    {
+        Debug.Log("제품 감지!");
+    }
+}
+```
+
+- Sensor 객체에 스크립트 추가
+
+- 콘솔로 변경 후 실행
+
+    ![alt text](image-106.png)
+
+- SensorTrigger.cs 스크립트 재수정
+
+```cs
+using System.Collections;
+using UnityEngine;
+
+public class SensorTrigger : MonoBehaviour
+{
+    [Header("컨베이어 1")]
+    public ConveyorBelt conveyor1;
+
+    [Header("컨베이어 2")]
+    public ConveyorBelt conveyor2;
+
+    private bool isProcessing = false;
+
+    // 다른 Collider가 들어와서 Trigger가 발생하면
+    private void OnTriggerEnter(Collider other)
+    {
+        if (isProcessing) return;
+
+        if (other.CompareTag("Product"))
+        {
+            // 시간이 걸리는 작업을 여러 프레임에 나눠서 실행하는 기능
+            StartCoroutine(Process());
+        }
+    }
+
+    private IEnumerator Process()
+    {
+        isProcessing = true;
+
+        Debug.Log("제품 감지!");
+
+        conveyor1.StopBelt();   // isRunning = false;
+        conveyor2.StopBelt();
+
+        yield return new WaitForSeconds(3.0f);  // 3초동안 대기한 뒤 다음 로직으로
+
+        conveyor1.StartBelt();
+        conveyor2.StartBelt();
+
+        yield return new WaitForSeconds(1.0f);
+
+        isProcessing = false;
+    }
+}
+```
+
+- ConveyorBelt 컨베이어 1번 변수에 Collider 지정된 벨트 객체 할당
+- ConveyorBelt 컨베이어 2번 변수에 Collider 지정된 벨트 객체 할당
+
+![alt text](image-108.png)
+
+- Product 프리팹에 `Product` 태그 생성 후 지정
+
+![alt text](image-107.png)
+
+#### 벨트 동작화면
+
+- TODO mp4 등록예정
+
+#### 컨베이어, 스폰 기능 동기화
+
+- TODO
+
+---
+
+### 2-4. ProBuilder
+
+#### 개요
+
+- Unity에서 건물을 손쉽게 만들 수 있도록 도와주는 패키지
+- 3D 모델링 기능이 없는 Unity를 Blender처럼 모델링할 수 있도록 지원
+- 단, 
+
+#### 설치
+
+- Window > Package Manager > Unity Registry에서 `ProBuilder` 검색 후 설치
+
+![alt text](image-109.png)
+
+#### 사용법
+
+- 메뉴 > Tools > ProBuilder > Create Shape > 오브젝트 선택
+
+![alt text](image-110.png)
+
+- Heirarchy 창 > 마우스 오른쪽 > ProBuilder > 오브젝트 선택
+
+- ProBuilder로 생성한 오브젝트 선택 후
+- Scene 뷰 툴바 > ProBuilder 선택
+
+TODO 이미지 추가
+
+- 상단 툴바에 ProBuilder용 아이콘 버튼 추가
+
+![alt text](image-111.png)
+
+- Cube 상태에서
+    - Vertex Selection(점 선택), Edge Selection(선 선택), Face Selection(면 선택)
+    - Move, Rotate, Scale기능으로 오브젝트 모양을 변형가능
+
+    ![alt text](image-112.png)
+
+- 3D 모델링툴 Blender와 유사한 기능
+
+#### Tip
+
+- 바닥 오브젝트(Plane)와 다른 오브젝트(Cube 등)를 공간없이
+    - Cube에서 V키 누른 상태에서 위치 이동
+
+    ![alt text](image-113.png)
+
+#### ProBuilder 오브젝트 변형법
+
+- ProBuilder 큐브 생성
+- 변형툴바 ProBuilder 선택
+- Face Selection 클릭 후 앞쪽 세로면 선택 Move 기능으로 확장
+
+![alt text](image-114.png)
+
+- Edge Selection 클릭 후 왼쪽 상단 선 선택 후 Move 기능으로 축소
+
+![alt text](image-115.png)
+
+- Face Selection 클릭 후 반대편 면 클릭
+- Context Menu > Extrued Faces 클릭
+
+![alt text](image-116.png)
+
+![alt text](image-117.png)
+
+- Move, Rotate, Scale 사용 - 모양을 변형
+
+- Face Selection 클릭 후 Cube 상단 클릭
+
+- Shift 누른 상태로 Scale 조정
+
+![alt text](image-118.png)
+
+- Context Menu > Extrued Faces 클릭
+
+![alt text](image-119.png)
+
+- Edge Selection 클릭 후 최상 후면 선 클릭 > Bevel Edges 클릭
+
+![alt text](image-120.png)
+
+- Edge를 여러개 선택 > Bevel Edges 클릭
+
+![alt text](image-121.png)
+
+- 바닥에서 1번 마우스 드래그 드롭으로 x축, z축으로 넓이 생성 후 2번 드래그 드롭으로 y높이 생성
 
 
 
 
-
-
-
-
-
-### 2-3. Unity Factory
+### 2-5. Unity Factory
 
 - Unity Technologies Japan에서 제공하는 무료 HDRP 공장 시뮬레이션 에셋
 - 공장 건물부터 컨베이어라인, 로봇팔, 작업자, 조명 등 제공

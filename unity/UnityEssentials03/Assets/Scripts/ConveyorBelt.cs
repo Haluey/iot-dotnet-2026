@@ -11,24 +11,32 @@ public class ConveyorBelt : MonoBehaviour
     [Header("물체이동 속도")]
     public float speed = 2.0f;
 
-    void Start()
-    {
-        
-    }
-
-    void Update()
-    {
-        
-    }
+    [Header("벨트 동작여부")]
+    public bool isRunning = true;
 
     // 매 프레임마다 두 충돌 영역이 접촉하고 있는 동안 발생하는 이벤트 핸들러
     private void OnCollisionStay(Collision collision)
     {
         Rigidbody rb = collision.rigidbody; // 충돌 감지된 오브젝트에 리지드바디 가져오기
 
-        if (rb != null)
+        if (rb == null) return;
+
+        if (!isRunning)
         {
-            rb.linearVelocity = moveDirection.normalized * speed;   // 이동방향으로 속도만큼 이동
+            rb.linearVelocity = Vector3.zero;   // 0으로 초기화
+            return;
         }
+
+        rb.linearVelocity = moveDirection.normalized * speed;   // 이동방향으로 속도만큼 이동
+    }
+
+    public void StopBelt()
+    {
+        isRunning = false;  // 중지
+    }
+
+    public void StartBelt()
+    {
+        isRunning = true;   // 재시작
     }
 }
