@@ -838,7 +838,7 @@ private IEnumerator Process()
 
 #### 최종 실행결과
 
-TODO : 동영상 추가
+https://github.com/user-attachments/assets/6dc46f0e-f8ee-4a2d-a16a-5fa0b65b8a72
 
 ---
 
@@ -1040,6 +1040,8 @@ TODO 이미지 추가
 - Spline 속성 > 적용할 Spline 지정
 
 - Movement Method Time Duration 변경
+
+https://github.com/user-attachments/assets/d1192529-26fc-49ac-9691-cac980bc22a3
 
 #### Product Spline 애니메이션
 
