@@ -628,6 +628,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SensorTrigger
   conveyor1: {fileID: 1618761944}
   conveyor2: {fileID: 325517311}
+  spawner: {fileID: 1791477814}
 --- !u!1 &1226768932
 GameObject:
   m_ObjectHideFlags: 0
