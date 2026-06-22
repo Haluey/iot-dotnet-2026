@@ -14,9 +14,10 @@ public class DeviceSimulator : MonoBehaviour
     public event DeviceMessage OnDeviceMessage;
 
     // Configuration of the devices to simulate
+    // MQTT 메시지 생성할 때 어떤 장비인지 아래의 divice_id 중 하나로 생성
     private List<DeviceConfiguration> deviceConfigurations = new List<DeviceConfiguration>
     {
-        // Doors
+        // 문
         new DeviceConfiguration { device_id = "CanteenDoor_Sensor", type = "door_sensor" },
         new DeviceConfiguration { device_id = "ReceptionDoor_Sensor", type = "door_sensor" },
         new DeviceConfiguration { device_id = "Door3_Door_Sensor", type = "door_sensor" },

@@ -1059,6 +1059,155 @@ https://github.com/user-attachments/assets/d1192529-26fc-49ac-9691-cac980bc22a3
 
 ![alt text](image-140.png)
 
+#### 전체 분석
+
+- Iot Sample Scene 오픈
+    - Hierchy 창 맨 위 오브젝트부터 분석 시작
+
+- Project 창
+    - IoTConnector 폴더 - IndustryCSE.IoT 네임스페이스 사용
+
+- 게임오브젝트 활성화 구분
+    - activeSelf - 자기자신이 활성상태인지 여부
+    - activeHierarchy - 부모오브젝트 포함해서 활성상태인지 여부
+
+1. Canvas UI 클릭
+    - Top Menu Bar 아래 구성 확인
+    - btn - Cloud 불필요, 사용체크 해제(비활성화)
+    - Date and Time 오브젝트
+        - DateTimeGenerator 스크립트 더블클릭
+        - yyyy-MM-dd HH:mm:ss 포맷팅으로 변경
+
+    ![alt text](image-141.png)
+
+2. ControlSystem - Canvas UI 왼쪽 버튼집합
+
+    - Button - 캔버스 사용시 제일 중요
+
+         ![alt text](image-142.png)
+
+    - On Click() 이벤트 확인
+    - AppStats.ToggleOccupancy()
+        - AppLogic 빈그룹 오브젝트 연결
+        - AppStates.cs가 컴포넌트로 연계
+
+        ![alt text](image-143.png)
+
+    - AppStates.cs 스크립트 분석/수정
+
+    - 한글 설정
+        - 한글 폰트 Assets에 복사
+        - Window > TextMeshPro > Font Asset Creator 선택
+        - 폰트 선택
+        - Padding > 5
+        - Atlas Resolution > 4096 X 4096
+        - Character Set > Custom Range
+        - 한글 입력범위를 `32-126,44032-55203,12593-12643,8200-9900`로 지정
+        - Render Mdoe > SDFAA
+        - Get Font Features 체크
+        - Generator Font Atlas 클릭
+
+            ![alt text](image-144.png)
+
+        - 완료 후 Save As로 리소스 폴더에 저장
+
+    - OverlayMode TextMeshPro 컴포넌트에 폰트 지정
+
+        ![alt text](image-145.png)
+
+    - 실행결과
+
+        ![alt text](image-146.png)
+
+    - App States에 적용된 폰트 변경 처리
+
+3. Camera
+    - CameraController.cs - 물체를 기준으로 화면을 회전, 줌인/아웃 기능
+
+4. BrightonOffice 오브젝트
+    - 3DMax, Blender 같은 3D 모델링 툴에서 작업한 3D 사무실 모델
+    - Briton_Floor_4 - 분석 의미없음
+
+5. BrightonOffice.Plane
+    - NavMesh Surface
+
+        ![alt text](image-147.png)
+
+    - NPC나 로봇이 길을 찾기위해 사용하는 이동가능한 바닥정보
+
+    - 로봇청소기의 경우 프리팹에 길이 셋팅되어 있음. Prefabs > AI BOTS 클릭
+
+        ![alt text](image-148.png)
+
+    - NavMash - 벽이나 장애물은 피하고, 이동가능한 바닥만 따라다니게 미리 계산해놓은 객체
+        - Agent Type - 어떤 캐릭터가 사용할지 결정
+        - Default Area - Walkable(이동 가능), Not Walkable(이동 불가), Jump(점프필요)
+        - Bake(굽기) 버튼 - 바닥분석 후, 이동가능한 영역 계산 후 새로운 NavMesh 생성
+        - 중간에 바닥을 막는 오브젝트가 존재하면 NavMesh가 분리됨
+
+            ![alt text](image-149.png)
+
+        - 문 등의 오브젝트를 제거하고 Clear 후 재Bake
+
+            ![alt text](image-150.png)
+
+6. IoTDevices - 오피스에 위치하는 IoT 센서 장비들에 대한 설정
+
+7. DeviceSimulator - IoT 시뮬레이션을 위한 더미데이터 생성용 클래스
+
+8. AppLogic - Humanoid, Robot 청소기 동작 처리용 오브젝트
+
+    ![alt text](image-151.png)
+
+    - AIAgent - Humanoid 오브젝트 PathWalker 스크립트 컴포넌트에 WayPoint 7개 이미지정하기
+    - WayPoint 위치 변경하면, NavMash Surface를 자동으로 이동
+
+9. MQTT Connector 
+    - IoThub.MqttMessageProvider.cs(MQTT 브로커 연결용)
+    - IoThub.IotDeviceMessageReader.cs(MQTT메시지 읽기용)
+    - 위 2가지 스크립트로 구성
+
+#### 분석 및 수정 결과화면
+
+TODO 동영상
+
+### 2.7 WPF Dummy IoT 연동 프로젝트
+
+- 기존 IoT Sample Project는 M2Mqtt라이브러리로 동작
+- 하지만 지금 프로젝트는 MQTTnet으로 진행
+
+#### Unity Project 생성
+
+- URP로 프로젝트 생성
+- Asset Store에서 `Low Poly`로 검색 후 Free 클릭
+    - Cute Magic – Stylized Low Poly Interior Pack
+    - Cute Low Poly Furniture Pack
+    - Pandazole - 저 폴리 에셋 번들
+
+#### 방 구성
+
+- Pandazole Home Interior 에셋으로 구성
+
+    ![alt text](image-152.png)
+
+#### MQTT 패키지 불러오기
+
+- Github에서 [NuGetForUnity](https://github.com/GlitchEnzo/NuGetForUnity) 설치
+
+    TODO 이미지
+
+- MQTTnet은 DLL을 직접 가져와서 구성, MQTTnet 버전 충돌
+- MQTT for Unity(M2Mqtt)를 사용
+
+    ![alt text](image-153.png)
+
+
+
+
+
+
+
+
 
 
 
