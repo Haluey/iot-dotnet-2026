@@ -1190,7 +1190,12 @@ TODO 동영상
 
     ![alt text](image-152.png)
 
-#### MQTT 패키지 불러오기
+#### 한글 폰트 설정
+
+<!-- 문서 내 링크 -->
+[전체분석 내 폰트설정](#전체-분석)
+
+#### NuGet 패키지 불러오기
 
 - Github에서 [NuGetForUnity](https://github.com/GlitchEnzo/NuGetForUnity) 설치
 
@@ -1199,15 +1204,39 @@ TODO 동영상
 - MQTTnet은 DLL을 직접 가져와서 구성, MQTTnet 버전 충돌
 - MQTT for Unity(M2Mqtt)를 사용
 
+#### M2MqttUnity 설치
+
+- M2Mqtt를 유니티 스크립트로 재정의해서 Unity에서 사용할 수 있게 만든 버전
+- https://github.com/gpvigano/M2MqttUnity Code zip으로 다운로드
+- 압축해제 후 
+- Project 창 Assets에 M2MqttUnity 압축해제한 Assets 폴더 복사
+- Unity에서 컴파일 진행
+
+- M2MQTT의 스크립트에 정보 작성하고 테스트
+
+![alt text](image-154.png)
+
+- MQTT Publish 메시지 확인
+
+![alt text](image-155.png)
+
+#### Unity MQTT Subscribe 메시지 수신
+
+![alt text](image-156.png)
+
+- SmartHomeMqttClient.cs 작성
+- 빈 객체 생성 > MqttClient 명명
+- 위 스크립트 컴포넌트 지정
+- Inspector에서 필요 데이터 입력, Broker Address, User Name, Password
+    - TOPIC, 상태표시 TextMesh Pro, JSON 데이터 출력 TextMesh Pro 지정
+
     ![alt text](image-153.png)
 
+- IoT Sample Project 에셋에서 CameraController.cs 가져오기
 
+- Essentials Pathway 에셋에서 SkyBox 머티리얼 가져와서 적용
 
-
-
-
-
-
+#### 전체 실행결과
 
 
 
