@@ -1238,8 +1238,9 @@ TODO 동영상
 
 #### 전체 실행결과
 
+https://github.com/user-attachments/assets/db15467a-6463-4f50-8114-af9a6a8db324
 
-
+---
 
 ### 2-7. Unity Factory 컨버전
 
