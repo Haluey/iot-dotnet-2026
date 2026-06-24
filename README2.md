@@ -670,4 +670,4 @@ CREATE TABLE sensor_data
 
 ### MVVM은 나중에
 
-[다음](./README3.md)
+[Unity 학습](./README3.md)
