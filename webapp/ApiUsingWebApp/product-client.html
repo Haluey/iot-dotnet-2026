@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>제품 관리</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+</head>
+<body>
+    <h2>상품 목록</h2>
+    
+    <hr>
+
+    <button onclick="loadProducts()" class="btn btn-sm btn-primary">상품 조회</button>
+
+    <ul id="productList" class="row mb-2 g-3"></ul>
+
+    <script>
+        const API_URL = 'http://localhost:5145/api/products';
+
+        async function loadProducts() {
+            const response = await fetch(API_URL);
+            const products = await response.json();
+
+            const productList = document.getElementById("productList"); // ul 태그 아이디
+            productList.innerHTML = '<li>번호 / 제품명 / 가격 / 재고</li>';
+
+            products.forEach(product => {
+                const li = document.createElement('li');    // js에서 동적으로 li 태그 생성
+                // javacript에서는 {}로 변수 사용할 때 `` 문자열 내부 ${}
+                li.textContent = 
+                        `${product.productId} / ${product.productName} / ${product.price}원 / 재고 ${product.stock}개`;
+
+                productList.appendChild(li);
+            });
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+</body>
+</html>

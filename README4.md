@@ -605,7 +605,258 @@ VALUES
 
 #### ProductsController 생성
 
-- 
+- Controller / ProductController.cs 생성 - [소스](./webapp/WebApiSolution/ProductApi/Controllers/ProductsController.cs)
+
+#### GET - 상품 리스트 조회
+
+- GET 메서드 작성
+
+##### 실행결과
+
+![alt text](image-181.png)
+
+#### 일반 메서드 vs 비동기 메서드
+
+- 일반 메서드 - DB처리가 완료될 때까지 나머지 로직이 중지
+
+    ```cs
+    [HttpGet]   // GET 메서드 선언(없어도 기본)
+    public IActionResult GetProducts()
+    {
+        List<Product> products = new(); // new List<Product>(); 와 동일기능
+
+        using var conn = new MySqlConnection(connString);
+        conn.Open();
+
+        string query = 
+            """
+            SELECT product_id, product_name, category, price, stock, created_at
+            FROM products
+            ORDER BY product_id DESC
+            """;    // 여러줄 문자열 @" 또는 """
+
+        using var cmd = new MySqlCommand(query, conn);
+        using var reader = cmd.ExecuteReader();
+
+        while (reader.Read())   // 
+        {
+            Product product = new Product
+            {
+                ProductId = reader.GetInt32("product_id"),
+                ProductName = reader.GetString("product_name"),
+                Category = reader.GetString("category"),
+                Price = reader.GetDecimal("price"),
+                Stock = reader.GetInt32("stock"),
+                CreatedAt = reader.GetDateTime("created_at")
+            };
+
+            products.Add(product);
+        }
+
+        return Ok(products);
+    }
+    ```
+
+- 비동기 메서드 - 백그라운드로 동작, 다른 기능 사용
+
+    ```csharp
+    [HttpGet]   // GET 메서드 선언(없어도 기본)
+    public async Task<IActionResult> GetProductsAsync() {
+        ...
+        await conn.OpenAsync();
+
+        ...
+        using var reader = await cmd.ExecuteReaderAsync();
+
+        while (await reader.ReadAsync()) {
+            ...
+        }
+
+        return Ok(products);
+    }
+    ```
+
+- GET /api/products
+
+#### GET - 상품 단건 조회
+
+- ProductsController에 단건 조회용 메서드 생성
+- GET /api/products/id
+
+##### 실행결과
+
+![alt text](image-182.png)
+
+- 성공화면
+
+![alt text](image-183.png)
+
+- 실패화면
+
+![alt text](image-184.png)
+
+- Postman 결과화면
+
+- 공공데이터 포털 기능은 대부분 여기까지
+
+#### POST 상품 등록
+
+- ProductsController에 단건 등록 메서드 생성
+- POST /api/products
+
+#### PostMan에서 테스트
+
+- GET 메서드 이외는 웹브라우저에서 테스트 매우 어려움
+- Swagger, Postman 등의 테스트 툴 사용이 거의 필수
+
+
+##### 실행결과
+
+![alt text](image-185.png)
+
+- Postman Post메서드 선택, Body > raw > json 데이터 입력, Send
+- Response 결과 맨아래 확인
+
+![alt text](image-186.png)
+
+- DB 입력 화면
+
+#### Command Execute 비교
+
+|메서드|사용방법|
+|---|---|
+| ExecuteReader() | SELECT 여러 행 조회 |
+| ExecuteNonQuery() | INSERT, UPDATE, DELETE 실행 |
+| ExecuteScalar() | 값 1개 반환(COUNT, MAX/MIN, LAST_INSERT_ID 등) |
+
+- 비동기는 ~Async() 로 작성할 것
+
+#### PUT - 상품 수정
+
+- POST 메서드로 구현 가능
+- PUT /api/products/id
+
+##### 실행결과
+
+![alt text](image-187.png)
+
+- PostMan 결과 화면
+
+![alt text](image-188.png)
+
+- Database 결과 확인
+
+- Postman에서 GET으로 변경하고 Send 확인
+
+#### PATCH - 필요컬럼 수정
+
+- POST 메서드로 구현 가능. 기능을 완전 분리하고 싶을 때 사용
+- PATCH /api/products/id
+- 재고만 수정거나 카테고리만 수정하고 싶은 기능을 추가하고자 할 때
+
+- Models의 Product.cs를 복사해서 ProductStock.cs로 변경
+- [HttpPatch("{id}/stock")] 로 URL 변경
+
+##### 실행결과
+
+![alt text](image-189.png)
+
+- PATCH 메서드에 맞게 URL 변경
+
+#### DELETE - 상품 삭제
+
+- DELETE /api/products/id
+- HttpDelete 메서드 추가
+
+##### 실행결과
+
+![alt text](image-190.png)
+
+- 삭제 확인
+
+![alt text](image-191.png)
+
+- 데이터베이스 확인
+
+#### HEAD, OPTIONS
+
+- 웹서비스 사용 여부 확인
+- 웹서비스에 지원하는 메서드 확인
+
+##### 실행결과
+
+![alt text](image-192.png)
+
+- HttpHead 결과화면
+
+TODO 이미지
+
+- HttpOptions 결과화면
+
+#### HttpMethod
+
+- [HttpMethod("GET")], [HttpMethod("POST")] 등으로 명시적으로 사용
+- 거의 사용 안함
+
+### RESTAPI 서비스 사용 애플리케이션
+
+- 하나의 웹 서비스를 가지고 여러 종류 애플리케이션에서 사용
+
+#### CORS 설정
+
+- Cross Origin Resource Sharing 교차 출저 자원 공유. 서버가 다른곳 같에 데이터 요청을 안전하게 하도록 허용해주는 설정
+- Program.cs 추가
+
+#### HTML + Javacript
+
+- product-client.html 생성
+- HTML, Javascript 구현
+
+##### 실행결과
+
+![alt text](image-193.png)
+
+- 일반 조회결과
+
+![alt text](image-194.png)
+
+- 부트스트랩 기본적용 결과
+
+![alt text](image-195.png)
+
+- 부트스트랩 일괄적용 화면
+
+#### WPF 1
+
+- 공공데이터포털 부산축제정보 앱 WPF 활용
+- 부산축제정보 앱 다운사이징 코딩
+
+##### 실행결과
+
+![alt text](image-196.png)
+
+- HTML + Javascript와 동일
+
+![alt text](image-197.png)
+
+- WPF 등록화면 및 성공메시지
+
+![alt text](image-198.png)
+
+- HTML + Javascript에서 추가된 데이터 확인 화면
+
+#### WPF 2
+
+- PUT, DELETE 기능 구현
+- Validation Check, Exception Handling 추가
+
+
+
+
+
+
+#### Unity
+
 
 
 

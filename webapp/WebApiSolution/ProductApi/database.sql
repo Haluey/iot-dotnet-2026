@@ -1,3 +1,5 @@
+DROP TABLE IF EXISTS products;
+
 CREATE TABLE products (
     product_id INT NOT NULL AUTO_INCREMENT,
     product_name VARCHAR(100) NOT NULL,
@@ -17,3 +19,36 @@ VALUES
 ('핸드폰 충전기', '전자기기', 18000, 10);
 
 SELECT * FROM products;
+
+SELECT product_id, product_name, category, price, stock, created_at
+  FROM products
+ ORDER BY product_id DESC;
+
+SELECT product_id, product_name, category, price, stock, created_at
+  FROM products
+ WHERE product_id = 3;
+
+INSERT INTO products
+(
+	product_name, 
+	category, 
+	price, 
+	stock
+)
+VALUES
+(
+	@ProductName, 
+	@Category, 
+    @Price, 
+    @Stock
+);
+
+SELECT LAST_INSERT_ID();
+
+UPDATE products
+   SET 
+   		product_name = @ProductName, 
+   		category = @Category, 
+   		price = @Price, 
+   		stock = @Stock, 
+WHERE product_id = @ProductId;

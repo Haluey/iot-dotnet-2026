@@ -1,3 +1,4 @@
 <Solution>
   <Project Path="ProductApi/ProductApi.csproj" />
+  <Project Path="WpfProductAdmin/WpfProductAdmin.csproj" Id="fc3bdf10-13db-424d-9b5e-56f3c3562466" />
 </Solution>
