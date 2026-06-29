@@ -941,25 +941,165 @@ else    // 수정. ProductEditWindow BtnSave기능
 
 ### Unity + RESTAPI 애플리케이션
 
-#### Unity 프로젝트
+- Unity URP 프로젝트 생성
+
+#### Newtonsoft Json 패키지 설치
+
+- Window > Package Manager > + > Install package by technical name...
+    - `com.unity.nuget.newtonsoft-json` 입력 후 Install
+
+TODO 이미지추가
+
+#### Canvas UI 추가
+
+- Canvas 추가. 2D 변경
+- Button 추가 -> BtnLoad
+- 나눔고딕 폰트 추가. 이전 파일 그대로 사용
+
+![alt text](image-205.png)
+
+- Text - TextMeshPro 추가 -> Logs
+
+#### Script 작성
+
+- ProductApiClient.cs 생성
+
+```cs
+public class ProductApiClient : MonoBehaviour
+{
+    [SerializeField]
+    private TMP_Text txtLog;
+
+    [SerializeField]
+    private string serviceUrl = "http://localhost:5276/api/products";
+
+    public void LoadProducts()
+    {
+        StartCoroutine(GetProducts());
+    }
+
+    private IEnumerator GetProducts()
+    {
+        using UnityWebRequest request = UnityWebRequest.Get(serviceUrl);
+
+        yield return request.SendWebRequest();
+
+        if (request.result != UnityWebRequest.Result.Success)
+        {
+            txtLog.text = request.error;
+            yield break;
+        }
+
+        txtLog.text = request.downloadHandler.text;
+    }
+}
+
+```
+
+#### GameObject 연결
+
+- 빈 객체 -> ProductApiManager 생성
+- ProductApiClient 스크립트를 하위 컴포넌트로 등록
+- TxtLog 변수에 캔버스에 추가한 Logs텍스트 할당
+
+![alt text](image-206.png)
+
+- BtnLoad OnClick 이벤트 추가
+
+- 스크립트의 부모 객체 ProductApiManager를 기본으로 선택
+- 실제 사용함수는 ProductApiClient.LoadProduct() 선태
+
+#### 실행화면
+
+![alt text](image-207.png)
+
+- API 서버 중지시 화면
+
+TODO 이미지추가
+
+- API 서버 정상동작 화면
+
+![alt text](image-208.png)
+
+- WPF에서 데이터 등록 후 Unity에서 재확인
+
+#### 데이터 리스트화면(2D) 만들기
+
+![alt text](image-209.png)
+
+- 화면 구조
+
+![alt text](image-216.png)
+
+- Panel - HeaderPanel, ButtonPanel, DatagridHeader
+- TMPro - HeaderTitle, Lbl~ 6개
+- Button - BtnLoad
+- ScrollView
+
+- Product.cs 스크립트 생성 - [소스](./unity/UnityProductApp/Assets/Scripts/Product.cs)
+
+#### ProductRow 프리팹
+
+![alt text](image-217.png)
+
+- ProductRow 객체 생성, UI 구성
+
+![alt text](image-210.png)
+
+- Prefabs 폴더 드래그, 프리팹 생성
+
+- ProductRowUi.cs 스크립트 생성
+
+- ProductRow 프리팹 더블클릭 > 프리팹 에디터 화면 전환
+
+- ProductRowUi.cs를 ProductRow root 객체 할당
+
+![alt text](image-211.png)
+
+#### ProductApiClient 스크립트 수정
+
+- 스크롤뷰 컨텐츠, ProductRow 프리팹 할당 추가 - [소스](./unity/UnityProductApp/Assets/Scripts/ProductApiClient.cs)
+
+#### ProductApiManager 아래 스크립트
+
+- ProductApiClient 스크립트에 Content, Product Row 프리팹 할당
+
+![alt text](image-212.png)
+
+#### 실행결과
+
+TODO 이미지 추가
+
+- 컨텐츠 아래 첫번째 줄에 모두 겹쳐져서 출력
+
+#### 프리팹 및 컨텐츠 수정
+
+- ProductRow 프리팹 오픈
+- Add Component > Layout Element
+- Min Height, Prefferd Height 35 지정
+- Flexible Height 0 지정
+
+- View port > content 클릭
+
+![alt text](image-213.png)
+
+#### 실행결과
+
+![alt text](image-214.png)
+
+- WPF에서 신규 데이터 입력
+
+![alt text](image-215.png)
+
+- Unity에서 신규 데이터 확인
+
+![alt text](image-218.png)
+
+## 4. ASP.NET Core 도커
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-## 4. 웹 실습 프로젝트
+## 5. 웹 실습 프로젝트
 
 ### IoT 스마트홈 통합 플랫폼 
 
