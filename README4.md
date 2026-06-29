@@ -845,17 +845,115 @@ TODO 이미지
 
 - HTML + Javascript에서 추가된 데이터 확인 화면
 
+#### 현재 상품등록 문제
+
+- 입력 Validation Check 구현되어 있지 않음
+
+![alt text](image-199.png)
+
+- ""(empty)는 null이 아니기 때문에 데이터 등록됨
+
+![alt text](image-200.png)
+
+- 데이터베이스에 빈 데이터 입력 확인
+
+- 데이터 입력 시 무조건 입력 검증 로직 필요
+
 #### WPF 2
 
-- PUT, DELETE 기능 구현
+![alt text](image-201.png)
+
 - Validation Check, Exception Handling 추가
 
+- 수정(PUT), 삭제(DELETE) 기능 구현
+
+![alt text](image-203.png)
+
+#### 디자인 렌더링 오류
+
+![alt text](image-202.png)
+
+- xaml 파일을 복사한 뒤 클래스명이 중복되어서 발생
+- 새로 만든 xaml 파일의 클래스명을 전부 수정
+
+#### 현재 구현의 문제
+
+- ProductCreateWindow.xaml과 ProductEditWindow.xaml가 존재
+- DB 설계 상 새로운 컬럼이 추가되면 두 화면을 모두 수정
+- 하나의 윈도우로 개발하면 한 화면만 수정의 효율성
+- ProductCreateWindow.xaml, ProductEditWindow.xaml -> ProductWindow.xaml 로 통합
+- 각 창의 필수기능, BtnSave 버튼 주요 로직만 조건에 따라 합치기
+
+```cs
+if (_product is null)   // 신규 생성. ProductCreateWindow BtnSave기능
+{
+    Product product = new Product
+    {
+        ProductName = TxtProductName.Text.Trim(),
+        Category = TxtCategory.Text.Trim(),
+        Price = Convert.ToDecimal(NudPrice.Value),
+        Stock = Convert.ToInt32(NudStock.Value)
+    };
+
+    bool result = await service.PostProductAsync(product);  // 서비스에 메서드 추가
+
+    if (result)
+    {
+        await this.ShowMessageAsync("저장", "상품이 등록되었습니다.");
+        DialogResult = true;
+        Close();
+    }
+    else
+    {
+        await this.ShowMessageAsync("저장", "상품 등록이 실패했습니다.");
+    }
+}
+else    // 수정. ProductEditWindow BtnSave기능
+{
+    // 이전 원본 객체를 수정
+    _product.ProductName = TxtProductName.Text.Trim();
+    _product.Category = TxtCategory.Text.Trim();
+    _product.Price = price;
+    _product.Stock = stock;
+
+    bool result = await service.UpdateProductAsync(_product);
+    MessageBox.Show($"{result}");
+
+    if (result)
+    {
+        await this.ShowMessageAsync("저장", "상품이 수정되었습니다.");
+        DialogResult = true;
+        Close();
+    }
+    else
+    {
+        await this.ShowMessageAsync("저장", "상품 수정에 실패했습니다.");
+    }
+}
+```
+
+#### 결론
+
+![alt text](image-204.png)
+
+- 기존 방식 - WPF에 DB 핸들링위해서 SQL 처리, 웹 개발(ASP.NET 포함)때도 DB 핸들링 SQL 처리 필요
+- REST API 방식 - DB 핸들링은 REST API 서비스에서 통합개발. 각 클라이언트에서는 서비스URL 호출(요청)으로 데이터를 처리
+
+### Unity + RESTAPI 애플리케이션
+
+#### Unity 프로젝트
 
 
 
 
 
-#### Unity
+
+
+
+
+
+
+
 
 
 

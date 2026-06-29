@@ -12,7 +12,7 @@
     
     <mah:MetroWindow.IconTemplate>
         <DataTemplate>
-            <iconPacks:PackIconMaterialDesign Kind="FestivalOutline" Foreground="White" Margin="10,7,0,0" />
+            <iconPacks:PackIconFontAwesome Kind="BoxesStackedSolid" Foreground="White" Margin="10,7,0,0" />
         </DataTemplate>
     </mah:MetroWindow.IconTemplate>
     <DockPanel Background="#F7F7F7">
@@ -124,7 +124,8 @@
                       RowHeaderWidth="0"
                       SelectionMode="Single"
                       SelectionUnit="FullRow"
-                      IsReadOnly="True" >
+                      IsReadOnly="True" 
+                      MouseDoubleClick="DgrProduct_MouseDoubleClick">
 
                 <DataGrid.Columns>
 
