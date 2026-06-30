@@ -1215,6 +1215,6 @@ ENTRYPOINT ["dotnet", "ProductApi.dll"]
 
 #### 전체 실행결과
 
-- TODO : 동영상 업로드
+https://github.com/user-attachments/assets/69efc9bc-6953-483a-b8db-abf652603a5d
 
 [토이프로젝트](./README5.md)
