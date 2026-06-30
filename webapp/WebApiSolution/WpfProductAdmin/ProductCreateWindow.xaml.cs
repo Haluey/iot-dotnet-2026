@@ -1,5 +1,4 @@
-﻿using System.Windows;
-using MahApps.Metro.Controls;
+﻿using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
 using WpfProductAdmin.Models;
 using WpfProductAdmin.Services;

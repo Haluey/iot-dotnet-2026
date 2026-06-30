@@ -1095,20 +1095,126 @@ TODO 이미지 추가
 
 ![alt text](image-218.png)
 
-## 4. ASP.NET Core 도커
+- MQTT 브로커를 접속해서 데이터를 가져오는 것보다 API 웹서비스를 접속해서 데이터 가져오는 것이 훨씬 간편
 
+### ASP.NET Core 도커
 
+- 웹서비스를 도커 이미지로 만든 후 도커에서 실행하는 방법
+- MSA(MicroService Architecture) 서비스를 만들 때 효율적
 
-## 5. 웹 실습 프로젝트
+![alt text](image-230.png)
 
-### IoT 스마트홈 통합 플랫폼 
+#### 도커
 
-- MQTT WPF + Unity + WebAPI 연동
+- `Linux 컨테이너(기본)`와 Windows 컨테이너로 구분. 둘 사이 전환(switch) 가능
+- `Linux 컨테이너` - `WSL`(Window Subsytem for Linux) 필수
+- Windows 컨테이너 - Hyper-V 필수
 
-### OpenAPI 서비스 + WPF 연동
+![alt text](image-220.png)
 
-### 스마트팩토리 MES 미니 플랫폼
+![alt text](image-221.png)
 
-### AI 비전 검사 시스템
+- Windows 컨테이너 상태 - 컨테이너 없음
 
-### 실시간 채팅 시스템 + 챗봇 기능
+![alt text](image-222.png)
+
+- Linux 컨테이너 상태 - MySQL 컨테이너 확인
+
+- ASP.NET Core 컨테이너 두 개 모두 지원
+
+#### 기존 프로젝트 Docker 지원 추가
+
+- appsetting.json 오픈. server localhost를 해당 IP주소로 변경!
+
+- release로 빌드
+
+- 프로젝트 > Context menu > 추가 > `컨테이너 지원` 선택
+
+![alt text](image-219.png)
+
+![alt text](image-223.png)
+
+- DockerFile 생성 - 도커 이미지 생성을 위한 구성 파일
+
+```dockerfile
+# Base
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
+WORKDIR /app
+EXPOSE 8080
+
+# Build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+ARG BUILD_CONFIGURATION=Release
+WORKDIR /src
+COPY . .
+
+# Publish
+RUN dotnet publish -c $BUILD_CONFIGURATION -o /app/publish
+
+# Final
+FROM base AS final
+WORKDIR /app
+COPY --from=build /app/publish .
+ENV ASPNETCORE_URLS=http://+:8080
+ENTRYPOINT ["dotnet", "ProductApi.dll"]
+```
+
+- 이미지 만들기
+
+```powershell
+# Visual Studio 안에서 DockerFile 위치한 곳에서 터미널열어서 실행
+# 이미지명은 소문자로
+> docker build -t productapi .
+```
+
+![alt text](image-224.png)
+
+- 빌드 진행사항
+
+![alt text](image-225.png)
+
+- 이미지 생성확인
+
+- 컨테이너 실행 - MySQL 80 이미지 실행과 거의 동일
+
+```powershell
+# 이전 위치랑 같은 위치에서 실행
+> docker run -d --name productapi-container -p 8080:8080 productapi
+```
+
+![alt text](image-226.png)
+
+- 컨테이너 실행화면
+
+![alt text](image-227.png)
+
+- 도커에서 실행되는 웹서비스 화면
+
+![alt text](image-228.png)
+
+- 디버깅용 도커 설치확인
+
+- 주의점!
+    - localhost 사용안됨. 서비스 중 IP주소로 변경
+    - 도커 컨테이너 실행여부 확인
+    - 유니티의 경우 HTTP 접속 허용
+
+        ![alt text](image-229.png)
+
+#### DevOps
+
+- Development + Operation - 개발과 운영을 하나의 프로세스로 연결. 소프트웨어 개발과 배포하는 문화 방법론
+- 개발 -> Git 저장 -> 자동빌드 -> Docker 이미지(Docker Hub) -> 서버 배포 -> 운영
+- DevOps 기술리스트
+    - `Git`, `GitHub`, GitHub Actions(자동 배포) - 소스 관리
+    - Jenkins(자동배포, 자동빌드) - CI
+    - `Docker`, Kubernetes - 컨테이너, 컨테이너 관리
+    - Azure, AWS, GCP - 클라우드
+    - Prometheus, Grafana - 모니터링
+    - ELK Stack(엘라스틱서치 스택) - 로그
+
+#### 전체 실행결과
+
+- TODO : 동영상 업로드
+
+[토이프로젝트](./README5.md)
