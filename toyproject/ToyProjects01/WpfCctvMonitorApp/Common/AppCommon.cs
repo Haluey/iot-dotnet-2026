@@ -82,5 +82,21 @@
             ["제주"] = new GeoBound(33.1000, 33.6000, 126.1000, 126.9500),
         };
 
+        // 글자 길이가 너무 길면 생략하는 메서드
+        public static string Ellipse(string text, int maxLength = 100)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                return string.Empty;    // ""
+            }
+
+            if (text.Length <= maxLength)
+            {
+                return text;
+            }
+
+            return text[..maxLength] + "...";
+        }
+
     }
 }
