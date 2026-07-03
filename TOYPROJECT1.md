@@ -339,8 +339,6 @@ TODO 동영상업로드
 
 - ItsCctvService 등록
 
-
-
 ##### appsetting.json
 
 - Its 서비스키 추가
@@ -351,17 +349,32 @@ TODO 동영상업로드
 
 ##### 실행결과
 
-TODO 이미지
+![alt text](image-247.png)
 
 - WPF에서 결과 json구조 변경
 
 #### 이전 WPF 연계작업
 
+##### API 웹서비스 CctvResultDto 가져오기 
 
+- WPF로 복사
+- 오류나는 부분들 전체 수정
 
+#### 전체 다이어그램
 
+![alt text](image-248.png)
 
+#### 사용기술
 
-
-
-
+| 구분 | 기술 |
+| --- | --- |
+| 윈앱 UI | WPF(.NET 10), WPF UI Framework |
+| 통신 | HTTP(HTTPS 확장가능) |
+| 데이터형식 | JSON, 직렬화, 역직렬화 |
+| 브릿지서버 | ASP.NET Core Web API |
+| 웹서버 | Kestrel(크로스플랫폼 웹서버) |
+| 설정관리 | appsettings.json, App.config(XML)|
+| 서비스 호출 | HttpClient |
+| 외부 API | ITS 국가교통정보센터 OpenAPI |
+| API방식 | REST API |
+| 웹아키텍처 | Model-Service-Controller Layer |

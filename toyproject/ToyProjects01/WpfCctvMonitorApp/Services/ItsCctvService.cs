@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
-using System.Collections.ObjectModel;
 using System.Net.Http;
+using System.Text;
+using WpfCctvMonitorApp.Common;
 using WpfCctvMonitorApp.Models;
 
 namespace WpfCctvMonitorApp.Services
@@ -22,9 +23,24 @@ namespace WpfCctvMonitorApp.Services
                 return result;
         }
 
-        public async Task<ObservableCollection<CctvInfo>> GetAllCctvAsync()
+        public async Task<List<CctvResultDto>> GetBridgeApiAsync(CctvRequest request)
         {
-            return null;
+            var req = new HttpRequestMessage(HttpMethod.Get, AppCommon.baseUrl);
+
+            req.Content = new StringContent(
+                JsonConvert.SerializeObject(request),
+                Encoding.UTF8,
+                "application/json"
+            );
+
+            var response = await httpClient.SendAsync(req);
+
+            string json = await response.Content.ReadAsStringAsync();
+
+            var result = JsonConvert.DeserializeObject<List<CctvResultDto>>(json);
+
+            if (result == null) return new();
+            else return result;
         }
 
     }
