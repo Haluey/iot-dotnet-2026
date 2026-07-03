@@ -3,6 +3,7 @@ using System.Configuration;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Media;
+using Wpf.Ui;
 using Wpf.Ui.Controls;
 using WpfCctvMonitorApp.Common;
 using WpfCctvMonitorApp.Models;
@@ -24,6 +25,9 @@ namespace WpfCctvMonitorApp
 
         // 지역 선택한 위경도 범위 저장할 변수
         private GeoBound selectedGeoBound;
+
+        // ProgressRing 창 변수
+        private LoadingWindow? loadingWindow;
 
         #endregion
 
@@ -53,11 +57,20 @@ namespace WpfCctvMonitorApp
 
             await InitWebView2Async();  // 웹뷰2 초기화
 
-            var result = InitApiKey();  // App.config에서 API키 받아오기
+            var result = await InitApiKey();  // App.config에서 API키 받아오기
             if (!result) return;
 
+            InitAppName();
             InitStatusBar();   // xaml 화면 텍스트들 초기화
             InitComboItems();   // 콤보박스 지역리스트업
+        }
+
+        private void InitAppName()
+        {
+            // 비하인드코드로 작업하면 유지보수가 쉬움
+            // 윈도우타이틀, WPF UI TitleBar 공통작업
+            // HACK : 제목을 변경하려면 AppCommon.appName을 변경하세요
+            this.Title = TlbMain.Title = AppCommon.appName;
         }
 
         /// <summary>
@@ -108,11 +121,19 @@ namespace WpfCctvMonitorApp
         }
 
         // 종료여부 확인
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        private async void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            var result = System.Windows.MessageBox.Show("종료하시겠습니까?", "종료 확인", System.Windows.MessageBoxButton.YesNo, MessageBoxImage.Question);
+            //var result = System.Windows.MessageBox.Show("종료하시겠습니까?", "종료 확인", System.Windows.MessageBoxButton.YesNo, MessageBoxImage.Question);
 
-            if (result == System.Windows.MessageBoxResult.No)
+            //if (result == System.Windows.MessageBoxResult.No)
+            //{
+            //    e.Cancel = true;
+            //    return;
+            //}
+
+            var result = await ShowConfirmAsync("종료 확인", "종료하시겠습니까?");
+
+            if (!result)
             {
                 e.Cancel = true;
                 return;
@@ -158,17 +179,23 @@ namespace WpfCctvMonitorApp
             // Validation Check
             if (selectedGeoBound == null)
             {
-                System.Windows.MessageBox.Show("지역을 선택하세요", "오류");
+                await ShowMessageAsync("오류", "지역을 선택하세요");
+                //System.Windows.MessageBox.Show("지역을 선택하세요", "오류");
                 return;
             }// 아니면 try ~ catch
 
-            AppCommon.MinX = selectedGeoBound.MinLng;
-            AppCommon.MaxX = selectedGeoBound.MaxLng;
-            AppCommon.MinY = selectedGeoBound.MinLat;
-            AppCommon.MaxY = selectedGeoBound.MaxLat;
-
             try
             {
+                // 로딩창 열기
+                ShowLoading();
+                BtnSearch.IsEnabled = false;
+
+                // 프로세스 진행
+                AppCommon.MinX = selectedGeoBound.MinLng;
+                AppCommon.MaxX = selectedGeoBound.MaxLng;
+                AppCommon.MinY = selectedGeoBound.MinLat;
+                AppCommon.MaxY = selectedGeoBound.MaxLat;
+
                 var totalApiUrl = AppCommon.BuildCctvApiUrl();
 
                 var result = await itsCctvService.GetCctvListAsync(totalApiUrl);
@@ -183,10 +210,16 @@ namespace WpfCctvMonitorApp
             catch (Exception ex)
             {
                 // 대부분 OpenAPI 호출 이후 네트워크문제에서 발생
-                System.Windows.MessageBox.Show($"CCTV 검색 중 오류가 발생했습니다. {ex.Message}", "검색 오류",
-                                    System.Windows.MessageBoxButton.OK, MessageBoxImage.Error);
+                await ShowMessageAsync("검색 오류", "CCTV 검색 중 오류가 발생했습니다. {ex.Message}");
+                //System.Windows.MessageBox.Show($"CCTV 검색 중 오류가 발생했습니다. {ex.Message}", "검색 오류",
+                //                    System.Windows.MessageBoxButton.OK, MessageBoxImage.Error);
             }
-
+            finally
+            {
+                // 로딩창 닫기
+                HideLoading();
+                BtnSearch.IsEnabled = true;
+            }
         }
 
         // 리스트박스 선택 후 이벤트
@@ -243,14 +276,15 @@ namespace WpfCctvMonitorApp
             VvwScreen.MediaPlayer = mediaPlayer;
         }
 
-        private static bool InitApiKey()
+        private async Task<bool> InitApiKey()
         {
             AppCommon.ItsApiKey = ConfigurationManager.AppSettings["ItsApiKey"];
             //MessageBox.Show(AppCommon.ItsApiKey);
 
             if (string.IsNullOrWhiteSpace(AppCommon.ItsApiKey))
             {
-                System.Windows.MessageBox.Show("ITS API Key가 설정되지 않았습니다.");
+                //System.Windows.MessageBox.Show("ITS API Key가 설정되지 않았습니다.");
+                await ShowMessageAsync("오류", "ITS API Key가 설정되지 않았습니다.");
                 return false;
             }
 
@@ -372,9 +406,12 @@ namespace WpfCctvMonitorApp
         {
             if (cctv != null)   // 실제 데이터 할당
             {
-                TxtCctvName.Text = cctv.CctvName;
-                TxtRoadName.Text = "";
-                TxtDirection.Text = "";
+                // 정규식으로 CctvName에 들어온 문자열 분해
+                var (cctvName, roadName, direction) = AppCommon.ParseName(cctv.CctvName);
+
+                TxtCctvName.Text = cctvName;    //cctv.CctvName
+                TxtRoadName.Text = roadName;
+                TxtDirection.Text = direction;
                 TxtCoordY.Text = cctv.CoordY;
                 TxtCoordX.Text = cctv.CoordX;
                 TxtCctvFormat.Text = cctv.CctvFormat;
@@ -405,7 +442,7 @@ namespace WpfCctvMonitorApp
         }
 
         // 스트리밍 재생 메서드
-        private void PlayCctv(string url)
+        private async Task PlayCctv(string url)
         {
             if (string.IsNullOrWhiteSpace(url))
                 return;
@@ -418,12 +455,65 @@ namespace WpfCctvMonitorApp
             }
             catch (Exception ex)
             {
-                System.Windows.MessageBox.Show(ex.Message);
+                await ShowMessageAsync("오류", $"스트리밍 재생 오류 발생 : {ex.Message}");
+                //System.Windows.MessageBox.Show(ex.Message);
             }
 
         }
 
+        // 단순 MessageBox.Show 대신 사용할 메서드
+        private async Task ShowMessageAsync(string title, string message)
+        {
+            var uiMessageBox = new Wpf.Ui.Controls.MessageBox
+            {
+                Title = title,
+                Content = message
+            };
+
+            _ = await uiMessageBox.ShowDialogAsync();
+        }
+
+        // 예/아니오 선택 MessageBox.Show 대신 사용할 메서드
+        private async Task<bool> ShowConfirmAsync(string title, string message)
+        {
+            var uiMessageBox = new Wpf.Ui.Controls.MessageBox
+            {
+                Title = title,
+                Content = message,
+
+                PrimaryButtonText = "예",
+                SecondaryButtonText = "아니오",
+                IsCloseButtonEnabled = false
+            };
+
+            var result = await uiMessageBox.ShowDialogAsync();
+            return result == Wpf.Ui.Controls.MessageBoxResult.Primary;
+        }
+
+        // 로딩창 열기
+        private void ShowLoading()
+        {
+            if (loadingWindow != null) return;
+
+            loadingWindow = new LoadingWindow
+            {
+                Owner = this,
+                WindowStartupLocation = WindowStartupLocation.CenterOwner,
+            };
+
+            loadingWindow.Show();
+        }
+
+        // 로딩창 닫기
+        private void HideLoading()
+        {
+            if (loadingWindow == null) return;
+
+            loadingWindow.Close();
+            loadingWindow = null;
+        }
+
         #endregion
-        
+
     }
 }

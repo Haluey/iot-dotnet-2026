@@ -1,7 +1,12 @@
-﻿namespace WpfCctvMonitorApp.Common
+﻿using System.Text.RegularExpressions;
+using System.Windows.Navigation;
+
+namespace WpfCctvMonitorApp.Common
 {
     public static class AppCommon
     {
+        public const string appName = "국가교통정보센터 CCTV 정보앱 v1.3";
+
         public const string baseUrl = "https://openapi.its.go.kr:9443/cctvInfo";
 
         // 승인받은 API키 입력. user-secret, setx 로 외부 공개 안하거나, App.config 환경변수로 분리 저장
@@ -96,6 +101,33 @@
             }
 
             return text[..maxLength] + "...";
+        }
+
+        // CctvName 잘라서 분리메서드
+        // string.Substring()으로 가능한 작업 -> 정규식은 간결하게 패턴타입 처리가능
+        public static (string cctvName, string roadName, string direction) ParseName(string originCctvName)
+        {
+            if (string.IsNullOrWhiteSpace(originCctvName))
+            {
+                return ("", "", "");
+            }
+
+            // "[수도권제1순환선] 성남요금소 (서울)" 문자열을 정규식패턴으로 자르기
+            Match match = Regex.Match(
+                originCctvName,
+                @"^\[(.*?)\]\s*(.*?)(?:\((.*?)\))?$"
+            );
+
+            if (!match.Success)
+            {
+                return (originCctvName, "", "");    // 패턴매칭 실패
+            }
+
+            var roadName = match.Groups[1].Value.Trim();
+            var cctvName = match.Groups[2].Value.Trim();
+            var direction = match.Groups[3].Value.Trim();
+
+            return (cctvName, roadName, direction);     // Python tuple과 동일
         }
 
     }

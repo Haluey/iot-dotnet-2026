@@ -291,10 +291,29 @@ PM> Install-Package WPF-UI
 
 https://github.com/user-attachments/assets/469cec27-e823-4145-94d4-c1ebbac1b387
 
+##### 추가 수정
+
+- [X] 제목표시줄 추가 - WPF UI 특성
+- [X] 메시지박스 변경
+
+    TODO 이미지
+
+    TODO 이미지
+
+- [X] CCTV 정보 글자 잘라서 표기
+
+    ![alt text](image-246.png)
+
+- [] 리스트박스 목록 크기, 텍스트, 즐겨찾기 정리
+
 ##### 프로그레스바
 
 - 검색 후 리스트박스 항목 다 나오기 전까지 표시
 - WPF UI 적용 후 반영
+
+##### UI 적용화면
+
+TODO 동영상업로드
 
 ##### 즐겨찾기 DB 추가
 
@@ -303,6 +322,45 @@ https://github.com/user-attachments/assets/469cec27-e823-4145-94d4-c1ebbac1b387
 ---
 
 ### OpenAPI 래핑 웹서비스
+
+#### 브릿지 웹서비스 구현
+
+##### ASP.NET Core API 프로젝트
+
+##### WPF 앱 필요 클래스 가져오기
+
+- 네임스페이스를 현재 이름으로 변경
+    - AppCommon.cs 불필요한 속성 제거
+    - CctvInfo.cs
+    - CctvResponse.cs
+    - ItsCctvService.cs 수정
+
+##### Program.cs에 서비스 등록
+
+- ItsCctvService 등록
+
+
+
+##### appsetting.json
+
+- Its 서비스키 추가
+
+##### ApiController 추가
+
+- ItsCctvController.cs 클래스 생성
+
+##### 실행결과
+
+TODO 이미지
+
+- WPF에서 결과 json구조 변경
+
+#### 이전 WPF 연계작업
+
+
+
+
+
 
 
 
