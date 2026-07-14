@@ -218,14 +218,14 @@ private Person? selectedPerson;
             this._coordinator = coordinator;    // App.xaml.cs에서 생성하면서 넘어온 파라미터를 초기화
         }
 
-        // 사용법
+        // 메서드 내 사용법
         [RelayCommand]
         public async Task AppExit() {
             await _coordinator.ShowMessageAsync(this, "종료확인", "종료하시겠습니까?");
         }
         ```
 
-    - MainView.xaml의 mah:MetroWindow태그에 추가
+    - MainView.xaml의 mah:MetroWindow태그에 다이얼로그 속성 추가
 
         ```xml
         <mah:MetroWindow 
@@ -234,12 +234,59 @@ private Person? selectedPerson;
             mah:DialogParticipation.Register="{Binding}">
         ```
 
+- 실행결과
 
+    ![alt text](image-254.png)
 
+#### 메인영역 화면 전환
 
+- Page로 화면전환은 Frame 컨트롤 사용(네비게이션 기능)
+- UserControl로 화면전환은 ContentControl 컨트롤 사용(화면 변경)
 
+- MainView 화면
 
+```xml
+<!-- 메인 영역(장르 관리, 도서 관리, 회원 관리, 대여 관리) -->
+<ContentControl Grid.Row="1" Content="{Binding CurrentView}" />
+```
 
+- MainViewModel 클래스
+
+```cs
+// 메인화면 영역
+[ObservableProperty]
+private UserControl currentView;    
+// public CurrentView 속성 자동생성
+```
+
+- MainView 메뉴 명령추가
+
+```xml
+<MenuItem Header="책장르" Command="{Binding ShowDivisionCommand}">
+```
+
+- MainViewModel.ShowDivision() 메서드
+
+```cs
+[RelayCommand]
+public void ShowDivision() {
+    var view = new DivisionView();
+    view.DataContext = new DivisionViewModel(DialogCoordinator.Instance);
+
+    CurrentView = view;
+}
+```
+
+- 실행화면
+
+    ![alt text](image-255.png)
+
+#### 화면 복제
+
+- View 관련된 xaml 파일 복사 후 이름 변경 / 클래스명 변경
+- ViewModel 클래스 복사 후 이름 변경 / 클래스명 변경
+- MainView에서 메뉴 명령 추가
+- MainViewModel에서 명령에 바인딩되는 메서드 추가
 
 
 

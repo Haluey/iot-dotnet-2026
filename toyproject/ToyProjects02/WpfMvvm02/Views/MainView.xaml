@@ -52,7 +52,7 @@
                         </MenuItem.Icon>
                     </MenuItem>
 
-                    <MenuItem Header="도서" Command="">
+                    <MenuItem Header="도서" Command="{Binding ShowBookCommand}">
                         <MenuItem.Icon>
                             <iconPacks:PhosphorIcons Kind="BooksFill"/>
                         </MenuItem.Icon>
@@ -87,14 +87,12 @@
         </StackPanel>
         
         <!-- 메인 영역(장르 관리, 도서 관리, 회원 관리, 대여 관리) -->
-        <ContentControl Grid.Row="1" Content="{Binding CurrentView}">
-            
-        </ContentControl>
-        
+        <ContentControl Grid.Row="1" Content="{Binding CurrentView}" />
+
         <!-- 상태바 -->
         <StatusBar Grid.Row="2">
-            <StatusBarItem Content="TEST"></StatusBarItem>
-            <StatusBarItem Content="TEST" HorizontalAlignment="Right"></StatusBarItem>
+            <StatusBarItem Content="{Binding CurrentViewName}" />
+            <StatusBarItem Content="TEST" HorizontalAlignment="Right" />
         </StatusBar>
         
     </Grid>

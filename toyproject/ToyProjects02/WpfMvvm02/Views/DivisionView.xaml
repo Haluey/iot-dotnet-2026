@@ -49,17 +49,17 @@
                 <TextBox Grid.Row="1" Margin="3"
                          mah:TextBoxHelper.Watermark="장르 코드" 
                          mah:TextBoxHelper.ClearTextButton="True"
-                         Text="" />
+                         Text="{Binding SelectedDivision.DivCode}" />
 
                 <TextBlock Grid.Row="2" Text="장르명" Margin="3" />
                 <TextBox Grid.Row="3" Margin="3"
                          mah:TextBoxHelper.Watermark="장르명" 
                          mah:TextBoxHelper.ClearTextButton="True"
-                         Text="" />
+                         Text="{Binding SelectedDivision.DivName}" />
 
                 <StackPanel Grid.Row="5" HorizontalAlignment="Right" Orientation="Horizontal">
                     <Button Content="초기화" Margin="0,0,5,0" Background="CadetBlue"
-                            Style="{StaticResource MahApps.Styles.Button.MetroSquare}" />
+                            Style="{StaticResource MahApps.Styles.Button.MetroSquare.Accent}" />
                     <Button Content="저장" Margin="0,0,5,0"
                             Style="{StaticResource MahApps.Styles.Button.MetroSquare.Accent}" />
                     <Button Content="삭제"

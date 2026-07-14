@@ -1,7 +1,12 @@
-﻿namespace WpfMvvm02.Models {
-    public class Division {
-        public string DivCode { get; set; } = string.Empty;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 
-        public string DivName { get; set; } = string.Empty;
+namespace WpfMvvm02.Models {
+    public partial class Division : ObservableObject {
+
+        [ObservableProperty]
+        private string divCode = string.Empty;
+
+        [ObservableProperty]
+        private string divName = string.Empty;
     }
 }
