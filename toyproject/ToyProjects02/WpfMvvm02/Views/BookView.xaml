@@ -68,9 +68,7 @@
                           ItemsSource="{Binding Divisions}"
                           SelectedValuePath="DivCode"
                           DisplayMemberPath="DivName"
-                          SelectedValue="{Binding SelectedBook.DivCode, 
-                                                  Mode=TwoWay, 
-                                                  UpdateSourceTrigger=PropertyChanged}"/>
+                          SelectedValue="{Binding SelectedBook.DivCode}" />
 
                 <!-- 책 제목 -->
                 <TextBox

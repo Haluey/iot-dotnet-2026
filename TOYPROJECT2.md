@@ -14,7 +14,7 @@
     - MVC 패턴과의 차이점 - 대문이 Controller 대신인 ViewModel이 아니고 `View`가 대문이다.
     - View에서 동작의 처리를 시작, **이벤트 핸들러가 모두 사라짐**
     - View에 해당하는 xaml.cs 파일에는 아무런 로직이 안들어감(디자이너는 로직을 생각하지 말 것)
-    - 버튼, 키보드 등의 이벤트가 모두 ViewModel로 넘어감 -> Command
+    - 버튼, 키보드 등의 이벤트가 모두 ViewModel로 넘어감 -> `Command`
     - 디버깅이 조금 어려움(몇몇 상태는 디버깅이 안됨)
 
     ![alt text](image-249.png)
@@ -93,7 +93,7 @@ public App()
 
 #### ViewModel에 버튼클릭 로직 추가
 
-- MVVM은 Click이벤트 사용 안 함. 대신 Command 사용
+- MVVM은 Click이벤트 사용 안 함. 대신 `Command` 사용
 
 ```cs
 public partial class MainViewModel : ObservableObject
@@ -110,7 +110,9 @@ public partial class MainViewModel : ObservableObject
 
 #### View에 버튼 추가
 
-- ViewModel의 RelayCommand 메서드명 + Command로 입력 필수
+- ViewModel의 RelayCommand 메서드명 + Command로 단어입력 필수
+- 비동기명령 메서드는 Async는 생략가능
+    - ChangeMessage`Async` -> ChangeMessage`Command`
 
 ```xml
 <Button Content="변경" Command="{Binding ChangeMessageCommand}"/>
@@ -136,7 +138,7 @@ public partial class MainViewModel : ObservableObject
 
 #### ListView 데이터 바인딩
 
-- ViewModel에 ObservableCollection 사용
+- ViewModel에 `ObservableCollection` 사용
 
 ```cs
 public ObservableCollection<Person> People { get; } =
@@ -181,7 +183,7 @@ private Person? selectedPerson;
 
 #### 필요 패키지
 
-- CommunityToolkit.Mvvm
+- `CommunityToolkit.Mvvm`
 - MahApps.Metro
 - MahApps.Metro.IconPacks
 - MySqlConnector
@@ -193,7 +195,7 @@ private Person? selectedPerson;
 
 #### 패턴 폴더 생성
 
-- Models, Views, ViewModels
+- `Models`, `Views`, `ViewModels` 네임스페이스
 
 #### MVVM 패턴에서 다이얼로그 처리
 
@@ -241,7 +243,7 @@ private Person? selectedPerson;
 #### 메인영역 화면 전환
 
 - Page로 화면전환은 Frame 컨트롤 사용(네비게이션 기능)
-- UserControl로 화면전환은 ContentControl 컨트롤 사용(화면 변경)
+- `UserControl`로 화면전환은 ContentControl 컨트롤 사용(화면 변경)
 
 - MainView 화면
 
@@ -288,7 +290,70 @@ public void ShowDivision() {
 - MainView에서 메뉴 명령 추가
 - MainViewModel에서 명령에 바인딩되는 메서드 추가
 
+#### 데이터 수정 후 변경표시 안되는 오류
 
+- 콤보박스 데이터바인딩된 컨트롤 데이터 선택시 바인딩 모드 문제발생
+- 콤보박스 SelectedValue 기본 바인딩모드 TwoWay, 저장 후 반영
 
+![alt text](image-257.png)
 
+```xml
+<!-- 장르 -->
+<ComboBox Grid.Row="1" Margin="3"
+          mah:TextBoxHelper.Watermark="장르명" 
+          ItemsSource="{Binding Divisions}"
+          SelectedValuePath="DivCode"
+          DisplayMemberPath="DivName"
+          SelectedValue="{Binding SelectedBook.DivCode, 
+                                  UpdateSourceTrigger=PropertyChanged}"/>
+```
 
+- UpdateSourceTrigger=PropertyChanged 는 옵션. 없애도 됨
+- 텍스트박스 Text 기본 바인딩모드 TwoWay, 직접 반영
+
+- ViewModel에서 ObservableCollection<> 객체 생성, DB 데이터 로드전에 초기화 로직 잘못 작성해서 생긴 문제
+
+#### Insert, Delete 기능 추가
+
+- DB 데이터 저장 - BookIdx가 0이면 INSERT
+- 초기화 기능 - SelectedBook 초기화
+- 입력검증 - 쓰레기 데이터 저장 방지
+
+![alt text](image-256.png)
+
+- 삭제 기능 - 버튼 커스터마이징
+
+```cs
+new MetroDialogSettings {
+    AffirmativeButtonText = "삭제",   // OK 대신
+    NegativeButtonText = "취소"   // Cancel 대신
+});
+```
+
+![alt text](image-258.png)
+
+- 삭제버튼 활성화 토글 - 삭제확인 메시지창보다 버튼 자체 비활성화
+- MVVM 기능 bool CanCommand() 사용으로 삭제여부 활성화 토글
+
+```cs
+[ObservableProperty]
+[NotifyCanExecuteChangedFor(nameof(DeleteCommand))]     // 변경알림
+private Book selectedBook;
+
+[RelayCommand(CanExecute = nameof(CanDelete))]
+public async Task DeleteAsync() {
+    // ...
+
+public bool CanDelete() {
+    return SelectedBook is { BookIdx: > 0 };
+}
+```
+
+![alt text](image-259.png)
+
+#### 예외처리/수정
+
+- [X] 저장버튼만 누르면 프로그램 종료
+- [X] 입력검증시 컨트롤마다 메시지창 뜨는 비효율성
+
+![alt text](image-260.png)
