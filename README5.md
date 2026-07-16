@@ -87,7 +87,11 @@
 
 #### MQTT 브로커 접속
 
-- MQTT Explorer에서 Publish 확인
+- MQTT Explorer에서 외부 MQTT 브로커 연결 정보 설정
+
+    ![alt text](image-275.png)
+
+- MQTT Explorer에서 토픽을 지정하여 메시지 Publish 확인
 
     ![alt text](image-267.png)
 
