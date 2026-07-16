@@ -542,6 +542,7 @@ InitTestScene*.unity*
 # 튜토리얼 폴더는 github 업로드 제외
 **/[Aa]ssets/Tutorials/
 
+# python .gitignore 설정
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
