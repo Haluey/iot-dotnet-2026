@@ -29,9 +29,9 @@
 - https://img.shields.io/docs/logos
 - https://simpleicons.org/
 
-```html
-<img src="https://img.shields.io/badge/PyTorch-EE4C2C?style=flat&logo=PyTorch&logoColor=white" />
-```
+    ```html
+    <img src="https://img.shields.io/badge/PyTorch-EE4C2C?style=flat&logo=PyTorch&logoColor=white" />
+    ```
 
 - badge 뒤 기술명-아이디, log명을 https://simpleicons.org/ 에서 검색 후 변경
 
