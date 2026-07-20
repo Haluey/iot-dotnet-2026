@@ -1,8 +1,23 @@
-# FastAPI Server 03
+# FastAPI Server 04 - Pydantic 예제
 import uvicorn
 from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel, Field
 
 app = FastAPI() # 객체 생성
+
+# BaseModel 기반 클래스 정의
+class ProductCreate(BaseModel):
+    # id : int = Field (
+    #     gt = 0
+    # )
+    name: str = Field (
+        min_length = 5,
+        max_length = 100    # DB 테이블의 경우 varchar 길이와 동일
+    )
+    price: int = Field (
+        gt = 0, # 0보다 커야함
+        le = 100_000_000
+    )
 
 # json 데이터 생성
 products = [
@@ -35,6 +50,31 @@ def root():
 def get_products():
     return products
 
+@app.post('/products')
+def create_product(product: ProductCreate):
+    ## 테스트용
+    # return {
+    #     'message' : '제품이 등록되었습니다.',
+    #     'product' : product
+    # }
+    new_id = max (
+        (item['id'] for item in products),  # 현재 리스트 id들
+        default = 0 # 0
+    ) + 1   # 현재 리스트 최대값 + 1
+
+    new_product = {
+        'id' : new_id,
+        'name' : product.name,
+        'price' : product.price
+    }
+
+    products.append(new_product)
+
+    return {
+        'message' : '새 상품 등록완료',
+        'product' : new_product
+    }
+
 # 상세 데이터
 @app.get('/products/{product_id}')
 def get_products(product_id: int):
@@ -61,4 +101,4 @@ def search_products(keyword: str, min_price: int=0):
     return result
 
 if __name__ == '__main__':
-    uvicorn.run('main03:app', reload=True, port=8080)
+    uvicorn.run('main04:app', reload=True, port=8080)
