@@ -63,6 +63,8 @@ def detectObjects(image: Image.Image):
 async def root():
     image = Image.open('./test01.png')  # PILLOW 패키지로 이미지 오픈 메모리업로드
 
+    if image.mode != 'RGB': 
+        image = image.convert('RGB')
     result = detectObjects(image)   # YOLO로 물체인식, 영역표시
 
     buffer = BytesIO()
@@ -75,6 +77,8 @@ async def root():
 # 결과를 다시 Response 해주는 함수
 @app.post('/detect', response_model=DetectionResult)
 async def detectService(message: str=Form(...), file: UploadFile = File(...)):
+    message = '[서버처리 완료] ' + message
+
     # 이미지 로드 PILLOW 이미지로 변환
     image = Image.open(BytesIO(await file.read()))  # 웹으로 전달된 이미지 로드
 
