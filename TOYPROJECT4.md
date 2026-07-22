@@ -247,7 +247,7 @@ protocol websockets
 
 - ASP.NET 웹페이지 객체인식결과 스트리밍
 
-TODO 동영상업로드
+https://github.com/user-attachments/assets/931d9bef-3303-4543-b35f-b7293ddca581
 
 - 클래스별로 색상다르게 표시
 
@@ -297,4 +297,6 @@ TODO 동영상업로드
 
 ![alt text](image-291.png)
 
-TODO 동영상 업로드
+- 실행결과
+
+https://github.com/user-attachments/assets/9007c66a-6b20-46ae-871f-70b7e10aeb33
