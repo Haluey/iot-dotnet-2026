@@ -275,7 +275,7 @@
 
         - 초기상태 : RGB(4, 3, 3)
         - 빨간색 물체 : RGB(21, 6, 6)
-        - 녹색 물체 : RGB(14, 18, 10)
+        - 초록색 물체 : RGB(14, 18, 10)
         - 파랑색 물체 : RGB(8, 11, 15)
         - ~~보라색 물체 : RGB(11, 9, 14)~~
         - ~~주황색 물체 : RGB(29, 15, 9)~~
@@ -293,16 +293,29 @@
 
 #### 통합로직 구현
 
+- [전체소스](./toyproject/ToyProjects05/arduino_part/sortingmachine/sortingmachine.ino)
 
+#### Arduino 교체 테스트
 
+- [Arduino UNO R3](https://www.devicemart.co.kr/goods/view?no=34404)에서 [Arduino UNO R4](https://www.devicemart.co.kr/goods/view?no=15088648)로 교체
 
+- 결론 - `Adafruit` 등 라이브러리 UNO R4에서 사용불가
 
+#### IR 적외선 센서팁
 
+- 레일에 파란색, 검은색 전기테이프도 인식됨
 
+#### 기본 동작
 
+TODO 동영상 업로드
 
+### 라즈베리파이 연결
 
-### MQTT 통신 시스템
+- 아두이노 + 라즈베리파이 5
+
+#### MQTT 통신 구현
+
+- Raspbian -> Windows 통신
 
 ### Unity 디지털트윈 시스템
 
