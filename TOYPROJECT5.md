@@ -59,7 +59,7 @@
 
 #### 테스트
 
-TODO 이미지
+![alt text](image-303.png)
 
 - Arduino IDE로 진행
 
@@ -67,59 +67,61 @@ TODO 이미지
 
 - 부저 테스트
 
-```cpp
-int buzzer = 4;
+    ```cpp
+    int buzzer = 4;
 
-void setup() {
-  Serial.begin(9600);
-  pinMode(buzzer, OUTPUT);
-}
+    void setup() {
+      Serial.begin(9600);
+      pinMode(buzzer, OUTPUT);
+    }
 
-void loop() {
-  digitalWrite(buzzer, HIGH);
-  delay(1000);
-  digitalWrite(buzzer, LOW);
-  delay(2000);
-}
-```
+    void loop() {
+      digitalWrite(buzzer, HIGH);
+      delay(1000);
+      digitalWrite(buzzer, LOW);
+      delay(2000);
+    }
+    ```
 
 - 기어드 DC 모터 컨베이어 테스트
     - L298P 쉴드에 최소 9V 전원(최대 24V)인가
     - 2A 넘기지 말것
 
-```cpp
-int motorSpeedPin = 10;
-int motorDirectionPin = 12;
-int value;
+    ```cpp
+    int motorSpeedPin = 10;
+    int motorDirectionPin = 12;
+    int value;
 
-void setup() {  
-  pinMode(motorDirectionPin, OUTPUT);
-  noTone(4);
-}
+    void setup() {  
+      pinMode(motorDirectionPin, OUTPUT);
+      noTone(4);
+    }
 
-void loop() {
-  // 정방향
-  digitalWrite(motorDirectionPin, HIGH);
-  for (value = 0; value <= 255; value += 5) {
-    analogWrite(motorSpeedPin, value);
-    delay(30);
-  }
-  delay(1000);
+    void loop() {
+      // 정방향
+      digitalWrite(motorDirectionPin, HIGH);
+      for (value = 0; value <= 255; value += 5) {
+        analogWrite(motorSpeedPin, value);
+        delay(30);
+      }
+      delay(1000);
 
-  // 역방향
-  digitalWrite(motorDirectionPin, LOW);
-  for (value = 0; value <= 255; value += 5) {
-    analogWrite(motorSpeedPin, value);
-    delay(30);
-  }
-  delay(1000);
-}
-```
+      // 역방향
+      digitalWrite(motorDirectionPin, LOW);
+      for (value = 0; value <= 255; value += 5) {
+        analogWrite(motorSpeedPin, value);
+        delay(30);
+      }
+      delay(1000);
+    }
+    ```
 
 - 기어드 DC 모터 제어 - [소스](./toyproject/ToyProjects05/arduino_part/sample01/sample01.ino)
     - 모터 스피드 값 0 ~ 255 사이에서 제어, 실제 50이하는 동작 안함
     - Default 80
     - 10부터 시작하면 60에서도 동작 안함. 255에서부터 줄여가면 50에서도 동작
+
+    ![alt text](image-300.png)
 
 - Serial Monitor 사용 주의점
     - 시리얼 입력에서 New Line, Carriage Return 선택 후 입력하면 값 이외에 다른데이터 전달됨
@@ -128,9 +130,177 @@ void loop() {
 
     ![alt text](image-297.png)
 
+- 적외선 IR 송수신 센서
+
+    ![alt text](image-301.png)
+
+    ```cpp
+    // 적외선 IR 센서
+    int sensor = A0;
+    int val;
+
+    void setup() {
+      Serial.begin(19200);
+      pinMode(sensor, INPUT);
+      Serial.println("Arduino start!");
+    }
+
+    void loop() {
+      val = digitalRead(sensor);
+
+      if (val == LOW) {
+        Serial.println("Detected");
+        delay(300);
+      }
+      else {
+        Serial.println("0");
+        delay(300);
+      }
+    }
+    ```
+
+    ![alt text](image-299.png)
+
+- 서보모터 SG-90
+    - 확장핀 3 연결, 시그널 D9 전달
+    - 각도 초기화 한 후 바를 연결
+
+    ![alt text](image-302.png)
+
+    ```cpp
+    // 서보모터
+    #include <Servo.h>
+    #define SERVO_PIN 9  // Digital 9
+    Servo servo;
+
+    void setup() {
+      Serial.begin(19200);
+      servo.attach(SERVO_PIN);  // 서보모터 연결
+      servo.write(0);  // 0도로 초기화(중요!)
+      delay(500);
+    }
+
+    void loop() {
+      if (Serial.available()) {
+        int value = Serial.parseInt();
+        servo.write(value);
+        Serial.println(value);
+        delay(100);
+      }
+    }
+    ```
+
+    TODO 동영상
+
+- RGB LED 네오픽셀
+    - Adafruit NeoPixel 라이브러리 추가
+
+    ```cpp
+    // NeoPixel LED 
+    #include <Adafruit_NeoPixel.h>
+    #define PIN 5
+    #define NUMPIXELS 3
+
+    Adafruit_NeoPixel pixels(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
+
+    void setup() {
+      pixels.begin();
+      pixels.setBrightness(50);
+    }
+
+    void loop() {
+      for (int i=0; i < NUMPIXELS; i++) {
+        pixels.setPixelColor(i, pixels.Color(255, 0, 0));
+        pixels.show();
+      }
+      delay(1000);
+
+      for (int i=0; i < NUMPIXELS; i++) {
+        pixels.setPixelColor(i, pixels.Color(0, 255, 0));
+        pixels.show();
+        delay(10);
+      }
+      delay(1000);
+
+      for (int i=0; i < NUMPIXELS; i++) {
+        pixels.setPixelColor(i, pixels.Color(0, 0, 255));
+        pixels.show();
+        delay(10);
+      }
+      delay(1000);
+    }
+    ```
+
+    - 1초당 RGB 색상 변경 확인
+
+- 컬러센서(TCS34725) 모듈
+    - RGB 색상 감지 
+    - Adafruit TCS34725 라이브러리 설치
+
+    ![alt text](image-304.png)
+
+    ```cpp
+    // Color Sensor
+    #include <Wire.h>
+    #include <Adafruit_TCS34725.h>
+
+    Adafruit_TCS34725 TCS = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS, TCS34725_GAIN_4X);
+
+    void setup() {
+      Serial.begin(19200);
+      TCS.begin();  
+    }
+
+    void loop() {
+      uint16_t clear, red, green, blue;
+      delay(100);
+      TCS.getRawData(&red, &green, &blue, &clear);
+
+      int r = map(red, 0, 21504, 0, 2000);
+      int g = map(green, 0, 21504, 0, 2000);
+      int b = map(blue, 0, 21504, 0, 2000);
+
+      Serial.print("    R: ");
+      Serial.print(r);
+      Serial.print("    G: ");
+      Serial.print(g);
+      Serial.print("    B: ");
+      Serial.println(b);
+    }
+    ```
+
+    - 색상 테스트
+
+        ![alt text](image-305.png)
+
+        - 초기상태 : RGB(4, 3, 3)
+        - 빨간색 물체 : RGB(21, 6, 6)
+        - 녹색 물체 : RGB(14, 18, 10)
+        - 파랑색 물체 : RGB(8, 11, 15)
+        - ~~보라색 물체 : RGB(11, 9, 14)~~
+        - ~~주황색 물체 : RGB(29, 15, 9)~~
+        - ~~노란색 물체 : RGB(41, 32, 13)~~
+
+#### 컨베이어벨트 조립
+
+- 조립중간 단계
+
+    ![alt text](image-306.png)
+
+- 완성 단계
+
+    ![alt text](image-298.png)
+
+#### 통합로직 구현
 
 
-![alt text](image-298.png)
+
+
+
+
+
+
+
 
 ### MQTT 통신 시스템
 
