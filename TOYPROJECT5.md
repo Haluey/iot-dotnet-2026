@@ -189,8 +189,8 @@
       }
     }
     ```
-
-    TODO 동영상
+    
+    https://github.com/user-attachments/assets/c67e2286-4f0b-4a15-a695-4a190889efa8
 
 - RGB LED 네오픽셀
     - Adafruit NeoPixel 라이브러리 추가
@@ -307,7 +307,7 @@
 
 #### 기본 동작
 
-TODO 동영상 업로드
+https://github.com/user-attachments/assets/86871893-f25b-450e-a844-4851ff365419
 
 ### 라즈베리파이 연결
 
