@@ -447,5 +447,16 @@ https://github.com/user-attachments/assets/86871893-f25b-450e-a844-4851ff365419
 
 https://github.com/user-attachments/assets/93fe8a48-cdc5-4fcd-95d6-6246c8221896
 
+### 센싱결과 색상 표시
+
+- Unity에서 제품 변경된 색상 표시
+
+### ESP32-CAM 연동
+
+### Database 데이터 저장
+
 ### WPF 모니터링 시스템
 
+### 벨트 제어
+
+- 모니터링 시스템에서 비상정지 기능
