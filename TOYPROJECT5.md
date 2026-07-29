@@ -445,7 +445,7 @@ https://github.com/user-attachments/assets/86871893-f25b-450e-a844-4851ff365419
 
 #### 실행결과
 
-TODO 동영상 업로드
+https://github.com/user-attachments/assets/93fe8a48-cdc5-4fcd-95d6-6246c8221896
 
 ### WPF 모니터링 시스템
 
