@@ -41,7 +41,7 @@ Adafruit_NeoPixel pixels(NUM_PIXELS, PIN_LED, NEO_GRB + NEO_KHZ800);
 
 uint16_t clear, red, green, blue;   // 색상 값을 저장할 unsigned short int형 변수
 int r, g, b, sum;   // 색상 값을 사용하기 위한 변환값
-int railSpeed = 80;    // 레일 기본 속도, 초기값은 160
+int railSpeed = 70;    // 레일 기본 속도, 초기값은 160
 char color = 'N';    // 확인 색상 (기본 N)
 
 // 초기화
