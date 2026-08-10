@@ -41,7 +41,7 @@ Adafruit_NeoPixel pixels(NUM_PIXELS, PIN_LED, NEO_GRB + NEO_KHZ800);
 
 uint16_t clear, red, green, blue;   // 색상 값을 저장할 unsigned short int형 변수
 int r, g, b, sum;   // 색상 값을 사용하기 위한 변환값
-int railSpeed = 70;    // 레일 기본 속도, 초기값은 160
+int railSpeed = 80;    // 레일 기본 속도, 초기값은 160. 12V로는 70가능 9V일 때는 80이하 불가
 char color = 'N';    // 확인 색상 (기본 N)
 
 // 초기화
@@ -70,13 +70,16 @@ void setup() {
 
 // 반복작업
 void loop() {
-  // 제품적재 여부 확인  
-  if(digitalRead(PIN_IR) == HIGH) return;   // IR 센서는 물체감지 시 LOW 전달
+  // analogWrite(PIN_DC_SPEED, 0); // 벨트끄기. 나중에 주석 처리
 
+  // 제품적재 여부 확인  
+  if (digitalRead(PIN_IR) == HIGH) return;   // loop() 함수를 빠져나가지만, 아두이노가 loop() 함수를 다시 실행. IR 센서는 물체감지 시 LOW 전달
+  Serial.println("D");  // 물체감지했다는 값 전달
+  
   analogWrite(PIN_DC_SPEED, railSpeed - 20);
   
   // 일정 시간 후 정지
-  delay(600);  // 600ms 딜레이
+  delay(500);  // 500ms 딜레이
   analogWrite(PIN_DC_SPEED, 0);   // 컬러센서에서 레일 정지
 
   // 컬러센서로 색상 판별

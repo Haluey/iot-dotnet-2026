@@ -447,9 +447,188 @@ https://github.com/user-attachments/assets/86871893-f25b-450e-a844-4851ff365419
 
 https://github.com/user-attachments/assets/93fe8a48-cdc5-4fcd-95d6-6246c8221896
 
-### 센싱결과 색상 표시
+### 센싱결과 색상 표시(26.08.10)
 
 - Unity에서 제품 변경된 색상 표시
+
+#### 전체 시스템 연결확인
+
+#### 컨베이어벨트 상 상품인식
+
+- 적외선 센서로 물체 감지를 MQTT로 전송
+
+    - 적외선 센서 핀으로 LOW가 들어올 때까지 loop() 함수를 계속 빠져나가고 아두이노는 loop() 함수를 계속 실행
+
+    ```cpp
+    // 생략
+    // 제품 적재여부 확인
+    if (digitalRead(PIN_IR) == HIGH) return; // loop() 함수를 빠져나가지만, 아두이노가 loop() 함수를 다시 실행. IR 센서는 물체감지 시 LOW 전달
+
+    Serial.println("D");      // 물체감지했다는 값 전달
+    // 생략
+    ```
+
+- MQTT로 받은 물체 감지값을 Unity에서 확인
+    - MQTT까지 데이터감지값(D)가 확인
+    - D가 넘어왔을 때 Unity에서 처리
+
+- 물체 감지 후 Box Spawner 실행 박스를 생성
+    - BoxSpawner.cs에 시간별로 생성하는 로직을 일반 생성으로 변경
+    - Timer 관련 소스 전부 삭제, 기본 생성만 유지
+
+    ```cs
+    public void Spawn()
+    {
+        Instantiate(prdPrefab,
+                    transform.position,
+                    Quaternion.identity);
+
+        Debug.Log("Box 생성");
+    }
+    ```
+
+- SensorTrigger.cs에 오류 발생. BoxSpawner.cs 함수 제거로 수정
+
+- Unity MQTT 스크립트 DecodeMessage() 메서드에 D에 대한 처리 추가
+
+    ```cs
+    [Header("Box Spawner")]
+    public BoxSpawner boxSpawner;   // MQTT에서 확인하고 박스를 생성
+    
+    // DecodeMessage() 메서드 내 추가
+    if (PrdResult.data == "D")
+        boxSpawner.Spawn(); // D가 들어올 때 박스 생성
+    ```
+
+- 물체가 인식될 때마다 Unity 박스 생성 확인
+
+- 이후 컨베이어 벨트가 자동으로 움직임 - 동작연동 처리
+
+- SensorTrigger.cs 수정
+    - BoxSpawner 변수 삭제
+    - 센서 위치에 박스가 들어오면 컨베이어를 멈추기만 함
+    - 색상 판별 이후 컨베이어 벨트 다시 동작하는 메서드 추가
+    - yield return은 전부 제거(비동기 제거 -> 동기 방식으로 HW와 연계)
+
+    ```cs
+    [Header("컨베이어 2")]
+    public ConveyorBelt conveyor2;
+
+    private bool isProcessing = false;
+
+    // 다른 Collider가 들어와서 Trigger 발생하면?
+    private void OnTriggerEnter(Collider other) {
+        if (isProcessing) return;
+
+        if (other.CompareTag("Product")) {
+            // 시간이 걸리는 작업을 여러 프레임에 나눠서 실행하는 기능
+            //StartCoroutine(Process());    // 타이머로 처리하지 않음
+            isProcessing = true;
+
+            // 센서 위치에서 컨베이어 정지
+            conveyor2.Stop();
+
+            Debug.Log("제품 도착 - 색상 판별중");
+        }
+    }
+
+    // MQTT에서 색상 판별 완료 후 호출
+    public void Resume() {
+        if (!isProcessing) return;
+
+        conveyor2.StartBelt();
+
+        isProcessing = false;
+
+        Debug.Log("색상판별 완료");
+    }
+    ```
+- SmartFactoryMqttClient.cs에 SensorTrigger 연결
+
+    ```cs
+    [Header("Sensor Trigger")]
+    public SensorTrigger sensorTrigger; // 센서확인 처리
+
+    // DecodeMessage() 메서드 아래 추가
+    if (prdResult.data == "D") {
+        boxSpawner.Spawn();
+    }
+    else if (prdResult.data == "R" ||
+                prdResult.data == "G" ||
+                prdResult.data == "B") {
+
+        // 색상별로 박스 색상변경 추가
+
+        sensorTrigger.Resume();
+    }
+    ```
+
+    ![alt text](image-324.png)
+
+- 컬러센서 결과로 유니티 박스 색상을 변경
+
+    - 유니티 에디터에서 Red_Mat, Green_Mat, Blue_Mat Material 생성
+
+        ![alt text](image-325.png)
+
+    - SensorTrigger.cs 스크립트에 색상 변경 메서드 SetColor() 추가    
+    - Material 연결 변수 추가
+    - 현재 객체지정 변수 추가
+
+        ```cs
+        [Header("색상 머티리얼")]
+        public Material redMaterial;    // 실제 머티리얼 객체와 연결
+        public Material greenMaterial;
+        public Material blueMaterial;
+
+        private GameObject currProduct; // 현재 스폰되고 색상 판별할 박스 지정
+
+        public void SetColor(string color) {
+            if (currProduct == null) return;    // 현재 물체가 없는데 색상 변경불가
+
+            Renderer renderer = currProduct.GetComponent<Renderer>();
+            if (color == "R") {
+                renderer.material = redMaterial;
+            }
+            else if(color == "G") {
+                renderer.material = greenMaterial;
+            }
+            else if (color == "B") {
+                renderer.material = blueMaterial;
+            }
+        }
+
+        private void OnTriggerEnter(Collider other)
+        {
+            if (isProcessing) return;
+
+            if (other.CompareTag("Product"))
+            {
+                isProcessing = true;
+                currProduct = other.gameObject; // 박스가 할당
+        ```
+
+    - SmartFactoryMqttClient.cs에 색상 감지 후 sensorTrigger 색상변경 추가
+
+        ```cs
+        // 색상별로 박스 색상변경 추가
+        sensorTrigger.SetColor(prdResult.data);
+        ```
+
+        ![alt text](image-326.png)
+
+#### Unity 실행결과
+
+TODO 동영상 업로드
+
+
+
+
+
+
+
+
+
 
 ### ESP32-CAM 연동
 

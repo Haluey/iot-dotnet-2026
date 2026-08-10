@@ -763,6 +763,8 @@ MonoBehaviour:
   txtDeviceId: {fileID: 1933789619}
   txtTimeStamp: {fileID: 152516665}
   txtData: {fileID: 1398166152}
+  boxSpawner: {fileID: 998527477}
+  sensorTrigger: {fileID: 1566795002}
 --- !u!4 &903261152
 Transform:
   m_ObjectHideFlags: 0
@@ -936,7 +938,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BoxSpawner
   prdPrefab: {fileID: 7144678105869998104, guid: c0d0b49987aff3e4bb16982dc965a049, type: 3}
-  interval: 3
 --- !u!1 &1110954499
 GameObject:
   m_ObjectHideFlags: 0
@@ -1472,8 +1473,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -3.1, y: -0.30000305}
-  m_SizeDelta: {x: 65, y: 13}
+  m_AnchoredPosition: {x: 6.5, y: -0.3}
+  m_SizeDelta: {x: 100, y: 13}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1398166152
 MonoBehaviour:
@@ -1688,7 +1689,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SensorTrigger
   conveyor2: {fileID: 609897641}
-  spawner: {fileID: 998527477}
+  redMaterial: {fileID: 2100000, guid: 314ce5f9cf0ac2f47b26042a0fa26627, type: 2}
+  greenMaterial: {fileID: 2100000, guid: 3585d77643fe40747ac3210741117882, type: 2}
+  blueMaterial: {fileID: 2100000, guid: b2640e06df7e8c74e81909660bbd04e4, type: 2}
 --- !u!65 &1566795003
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2127,7 +2130,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uC81C\uD488\uACB0\uACFC >"
+  m_text: "\uACF5\uC815\uC0C1\uD0DC >"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: c80a2b11e369e924d9673637e901c1bb, type: 2}
   m_sharedMaterial: {fileID: 6000048305317299214, guid: c80a2b11e369e924d9673637e901c1bb, type: 2}

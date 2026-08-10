@@ -21,6 +21,12 @@ public class SmartFactoryMqttClient : M2MqttUnityClient
     [Header("ProductResult Text")]
     public TMP_Text txtData;
 
+    [Header("Box Spawner")]
+    public BoxSpawner boxSpawner;   // MQTT에서 확인하고 박스를 생성
+
+    [Header("Sensor Trigger")]
+    public SensorTrigger sensorTrigger; // 센서확인 처리
+
     private readonly List<string> receivedMessages = new List<string>();
 
     // 감지결과 클래스
@@ -84,7 +90,45 @@ public class SmartFactoryMqttClient : M2MqttUnityClient
         txtDeviceId.text = prdResult.deviceId;
         Debug.Log(prdResult.timestamp);
         txtTimeStamp.text = prdResult.timestamp;
+
         Debug.Log(prdResult.data);
-        txtData.text = prdResult.data;
+
+        var resultText = "";
+        switch (prdResult.data) {
+            case "R":
+                resultText = "Red Product";
+                break;
+
+            case "G":
+                resultText = "Green Product";
+                break;
+
+            case "B":
+                resultText = "Blue Product";
+                break;
+
+            case "D":
+                resultText = "Product Detected";
+                break;
+
+            default:
+                resultText = "None";
+                break;
+        }
+        txtData.text = resultText;
+
+        if (prdResult.data == "D") {
+            boxSpawner.Spawn();
+        }
+        else if (prdResult.data == "R" ||
+                    prdResult.data == "G" ||
+                    prdResult.data == "B") {
+
+            // 색상별로 박스 색상변경 추가
+            sensorTrigger.SetColor(prdResult.data);
+
+            sensorTrigger.Resume();
+        }
+
     }
 }
