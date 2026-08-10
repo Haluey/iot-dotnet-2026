@@ -619,7 +619,8 @@ https://github.com/user-attachments/assets/93fe8a48-cdc5-4fcd-95d6-6246c8221896
 
 #### Unity 실행결과
 
-TODO 동영상 업로드
+https://github.com/user-attachments/assets/c0a0d1e1-54c5-4372-a498-00fa327b00c1
+
 
 
 
