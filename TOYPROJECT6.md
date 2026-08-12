@@ -315,8 +315,6 @@ YOLO 커스텀 학습이 필요
         VS Code: view Ultralytics VS Code Extension  at https://docs.ultralytics.com/integrations/vscode
         ```
 
-    - YOLO CNN 코드 작성해서 모델 학습(TODO)
-
 ##### 라즈베리파이 실시간 확인
 
 - best.pt파일 이전
