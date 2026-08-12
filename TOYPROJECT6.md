@@ -178,6 +178,155 @@ ESP32-CAM 동작확인
 
 ![alt text](image-339.png)
 
+### 물체인식 기능 추가
 
+#### Raspberry Pi Global Python에 PIP 라이브러리 설치방법
 
+- 라즈비안 Wormbook부터 글로벌 Python은 PIP로 라이브러리 설치가 금지(방지)
+
+    ```bash
+    $ pip install ~
+    error : externally-managed-environment
+    ```
+
+- 위 명령을 무시하고 설치하고자 하면
+
+    ```bash
+    ## 1번째 방법
+    $ sudo rm /usr/lib/python3.13/EXTERNALLY-MANAGED
+    # 삭제 후
+    $ pip install ~
+
+    ## 2번째 방법
+    $ pip install ~ --break-system-packages
+    ```
+
+#### Raspberry Pi YOLO 설치 시 주의점
+
+- YOLO 설치 (Python 가상환경)을 아래와 같이하면
+
+    ```bash
+    (.venv)$ pip install opencv-python 
+    (.venv)$ pip install ultralytics # YOLO 설치하면서 PyTorch와 같이 설치 
+    ```
+
+    - YOLO로 자동설치되는 PyTorch는 GPU버전이 설치됨
+    - ARM64 버전에 Nvidia Jetson Nano들은 GPU가 설치되어 있음
+    - MicroSD 32GB에서는 pip캐시 저장용량, ssd tmp 드라이브 용량이 모자람
+
+- Raspberry Pi에서 YOLO를 설치하려면 아래의 명령으로 진행할 것
+
+    ```bash
+    (.venv)$ pip install opencv-python
+    (.venv)$ pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu 
+    (.venv)$ pip install ultralytics # YOLO만 설치
+    ```
+
+#### YOLO 물체인식
+
+- ESP32-CAM으로 컬러센서 대신 물체인식 변경
+- YOLO에서 사용할 커스터마이징 모델 훈련, 생성
+- 현재 벨트상황에서 훈련시킬 물체 사진 캡쳐
+    - 최소 색상별(Red, Green, Blue) 100장 이상 캡쳐
+
+#### ESP32-CAM 캡쳐 기능
+
+- 보드 재부팅 현상 발생
+- 보류
+
+#### Python OpenCV 캡쳐 기능
+
+- [소스](./toyproject/ToyProjects06/raspberrypi_part/test_capture.py)
+
+![alt text](image-342.png)
+
+#### YOLO Pretrained Model 생성
+
+생산품 색상별 인식할 수 있는 YOLO 모델 생성해야 함
+
+YOLO 커스텀 학습이 필요
+
+1. 이미지 셋 준비 (색상별 100장 이상)
+2. **라벨링**
+3. `YOLO 형식에 맞게 export`
+4. 데이터 셋 폴더 구성 - Train 폴더 / Validation 폴더
+5. data.yaml 작성
+6. YOLO로 학습
+
+##### 라벨링 툴
+
+- [Robotflow](https://roboflow.com/) - 유료 라벨링 사이트
+- [cvat.ai](https://www.cvat.ai/) - 유료 라벨링 사이트. export 시 결재 팝업
+- [labelmg](https://github.com/HumanSignal/labelImg) - 무료툴 Github 오픈소스
+
+##### LabelImg툴 사용법
+
+![alt text](image-343.png)
+
+##### YOLO 학습 폴더(데이터셋) 구성
+
+- YOLO 학습을 위한 데이터셋 구성
+    - train : val - 8 : 2로
+    - images > train, val 
+    - labels > train, val 
+
+    ![alt text](image-344.png)
+
+    - data.yaml 작성
+
+##### YOLO 학습
+
+- `Fine-tuning` : 기존 yolo11n.pt 사전학습 모델을 가져와서 필요한 Red/Green/Blue 데이터로 재학습
+
+- YOLO 사전학습 모델 기반으로 학습
+    - data.yaml 절대경로로 작성
+    - Ultralytics 패키지 폴더 setting.json 파일 내 
+        - 윈도우 경우 C:\Users\User\AppData\Roaming\Ultralytics\setting.json
+        - `dataset_dir`(훈련시킬 데이터셋 경로로 지정), weights_dir, runs_dir
+
+    ```bash
+    yolo detect train data=C:\SourceBank\iot-dotnet-2026\toyproject\ToyProjects06\raspberrypi_part\data.yaml model=yolo11n.pt epochs=100 imgsz=640
+    ```
+
+    - 훈련 진행중 화면
+
+        ![alt text](image-345.png)
+
+    - 결과 화면. 모델 파일 위치 확인
+
+        ![alt text](image-346.png)
+
+    - 훈련 중간 배치 이미지 확인
+
+        ![alt text](image-347.png)
+
+    - 훈련모델 물체인식 테스트
+
+        ```powershell
+        (venv) PS C:\...\iot-dotnet-2026> yolo detect predict model=../runs/detect/train-5/weights/best.pt source=.\toyproject\ToyProjects06\raspberrypi_part\dataset\images\val\capture_018.jpg
+
+        Ultralytics 8.4.102  Python-3.12.10 torch-2.13.0+cu130 CUDA:0 (NVIDIA GeForce RTX 5060, 8151MiB)
+        YOLO11n summary (fused): 101 layers, 2,582,737 parameters, 0 gradients, 6.3 GFLOPs
+
+        image 1/1 C:\SourceBank\iot-dotnet-2026\toyproject\ToyProjects06\raspberrypi_part\dataset\images\val\capture_018.jpg: 480x640 1 red, 35.3ms
+        Speed: 1.2ms preprocess, 35.3ms inference, 10.0ms postprocess per image at shape (1, 3, 480, 640)
+        Results saved to C:\SourceBank\runs\detect\predict-5
+        Learn more at https://docs.ultralytics.com/modes/predict
+        VS Code: view Ultralytics VS Code Extension  at https://docs.ultralytics.com/integrations/vscode
+        ```
+
+    - YOLO CNN 코드 작성해서 모델 학습(TODO)
+
+##### 라즈베리파이 실시간 확인
+
+- best.pt파일 이전
+- raspberrypi_yolo.py실행
+
+    ![alt text](image-348.png)
+
+- 실시간 물체인식 확인
+
+### 기존 컨베이어벨트 키트와 통합
+
+### 유니티에서 컨베이어벨트 제어
 
