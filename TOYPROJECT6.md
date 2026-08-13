@@ -326,5 +326,185 @@ YOLO 커스텀 학습이 필요
 
 ### 기존 컨베이어벨트 키트와 통합
 
+#### OS 부팅시 자동실행 처리
+
+- 라즈베리파이에서 부팅 후 자동프로그램 실행
+
+- 자동 실행 방법
+    - .bashrc : 터미널 열 때 마다 실행. 항상 일정. ROS2 시스템 초기화 사용
+    - Autostart : GUI 로그인 후 실행. 라즈비안 버전마다 명령어가 변경
+    - crontab @reboot : 일정시간마다 실행되도록 하는 명령 포함
+    - systemd : 부팅 자동실행, 재시작, 로그 관리
+
+##### Autostart 실행 방법
+
+- 라즈비안 버전 마다 상이
+- ~~Raspbian Trixie 경우 : /etc/xdg/lxsession/rpd-x/autostart~~ 사용 불가
+- labwc 윈도우 매니저 방식의 autostart 사용
+
+- 프로젝트 폴더에 실행용 쉘 startup.sh 생성
+- `sudo nano ./startup.sh` 실행
+
+    ```bash
+    $ cd /home/pi/Toyproject/raspberrypi_part
+    $ sudo nano ./startup.sh
+    ```
+
+- 아래 내용 작성
+
+    ```sh
+    #!/bin/bash
+
+    sleep 5
+
+    cd /home/pi/Toyproject/raspberrypi_part
+
+    echo "=============================="
+    echo "   Data Interface 자동 실행   "
+    echo "=============================="
+
+    source .venv/bin/activate
+
+    echo "Python 가상환경"
+    which Python
+
+    echo "프로그램 실행"
+    python -u data_interface.py
+
+    echo "프로그램 종료"
+    read
+    ```
+
+- startup.sh에 실행권한 추가 및 파일 소유자 변경
+
+    ```bash
+    $ sudo chmod +x ./startup.sh   # 실행권한 추가
+    $ sudo chown pi:pi startup.sh  # 파일 소유자 변경
+    ```
+
+    ![alt text](image-350.png)
+
+- 사전 테스트 : 재부팅 전에 동작 확인
+
+    ![alt text](image-351.png)
+
+- autostart 파일 추가
+
+    ```bash
+    $ mkdir -p ~/.config/labwc
+    $ nano ~/.config/labwc/autostart
+
+    # autostart 파일 내 아래 명령어 추가 후 저장
+    lxterminal -e /home/pi/Toyproject/raspberrypi_part/startup.sh &
+    ```
+
+- 재부팅 확인
+    - 컨베이어 벨트 : 추가 전원으로 계속 동작
+    - ESP32-CAM : 전원들어오면 먼저 웹서버 실행
+    - MQTT, YOLO Python : 라즈비안 부팅 완료 후 실행
+
+##### systemd 서비스로 자동 실행
+
+- /etc/systemd/system 아래 다른 서비스 확인
+
+    ![alt text](image-352.png)
+
+- service 파일 생성
+
+    ```bash
+    $ sudo nano /etc/systemd/system/datainterface.service
+    ```
+
+    ```ini
+    [Unit]
+    Description=Python MQTT Service
+    After=network.target
+
+    [Service]
+    Type=simple
+    User=pi
+    WorkingDirectory=/home/pi/Toyproject/raspberrypi_part
+
+    ExecStart=/home/pi/Toyproject/raspberrypi_part/startup.sh
+
+    Restart=always
+    RestartSec=5
+
+    [Install]
+    WantedBy=multi-user.target
+    ```
+
+- systemd에 새 서비스 알려주기
+
+    ```bash
+    $ sudo systemctl daemon-reload
+    ```
+
+- 부팅 자동실행 등록 및 해제
+
+    ```bash
+    $ sudo systemctl enable datainterface.service   # 등록
+    $ sudo systemctl disable datinterface.service   # 해제
+    ```
+
+- 사전 테스트
+
+    ```bash
+    $ sudo systemctl start datinterface.service     # 시작
+    $ sudo systemctl status datinterface.service    # 로그 확인
+
+    ● datainterface.service - Python MQTT Service
+        Loaded: loaded (/etc/systemd/system/datainterface.service; enabled; preset: enabled)
+        Active: active (running) since Thu 2026-08-13 11:15:45 KST; 19s ago
+    Invocation: 3661f6daef644b8190198c11756c8b2c
+    Main PID: 2579 (startup.sh)
+        Tasks: 3 (limit: 4805)
+            CPU: 137ms
+        CGroup: /system.slice/datainterface.service
+                ├─2579 /bin/bash /home/pi/Toyproject/raspberrypi_part/startup.sh
+                └─2582 python -u data_interface.py
+
+    8월 13 11:15:45 hugonas startup.sh[2579]: Python 가상환경
+    8월 13 11:15:45 hugonas startup.sh[2581]: /home/pi/Toyproject/raspberrypi_part/.venv/bin/python
+    ...
+
+    $ sudo systemctl stop datinterface.service  # 정지
+    ```
+
+- 재부팅 후 확인
+    - 로그 출력은 되나 sytemctl status를 다시 실행해야 최신로그 확인됨
+
+##### 결론
+
+autostart 사용할 것
+
+#### YOLO + MQTT 통합, 아두이노 제어
+
+- 컨베이어 벨트에서 컬러 센서로 색상 판별
+- YOLO로 변경
+    - YOLO에서 감지한 색상을 시리얼통신으로 아두이노로 전달
+    - MQTT로 데이터 배포
+
+- 아두이노 시리얼 통신으로 YOLO 값 수신
+- 색상별 각도 조절, 벨트 동작
+
+##### YOLO 물체 감지영역 변경
+
+- ROI(Region Of Interest) : 관심영역으로 물체 인식 범위 지정
+- ROI 영역을 벗어나면 물체 인식 안 됨
+
+![alt text](image-353.png)
+
+##### Python YOLO 소스와 MQTT 통신소스 통합
+
+
+##### Python에서 Arduino로 시리얼통신 전송
+
+
+##### Arduino에서 수신된 값으로 서보모터 제어
+
+
+
+
 ### 유니티에서 컨베이어벨트 제어
 
