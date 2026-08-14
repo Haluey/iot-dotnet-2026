@@ -497,14 +497,51 @@ autostart 사용할 것
 
 ##### Python YOLO 소스와 MQTT 통신소스 통합
 
+- data_interface.py 와 test_yolo.py 소스 통합
+- 물체인식 동시에 MQTT로 데이터 Publish
+- total_interface.py - [소스](./toyproject/ToyProjects06/raspberrypi_part/total_interface.py)
+
+![alt text](image-354.png)
+
+- 물체인식 가능, MQTT 물체 Detect 이후 값 전달 안됨 -> 벨트 중지
+- 전달 위한 publish_yolo_data() 함수 작성
+
+![alt text](image-355.png)
+
+- 1초에 수번 ~ 수십번 MQTT 배포를 하는 상황
+
+##### 한 가지 물체 인식 쿨다운 기능 적용
+
+- 같은 물체 인식을 일정 시간동안 막았다가 다시 보내는 쿨다운 기능 추가
+- 증복 전송 방지 변수 추가, 물체인식 후 일정 시간 동안 데이터 전송 막기 로직 추가
+- 물체 인식하고 아두이노에 서보모터 각도 조절 제어 후 벨트 동작까지 시간 확보 위해서
 
 ##### Python에서 Arduino로 시리얼통신 전송
 
+- 클래스 명에 따라 R, G, B로 아두이노로 시리얼 데이터 전송
+
+```bash
+[YOLO ROI] blue 0.72
+[YOLO MQTT PUB] {"deviceId": "IOT52-RPI", "timestamp": "2026-08-14T11:32:22.180815", "color": "blue", "confidence": 0.72}
+serial_data = B
+
+[YOLO ROI] green 0.95
+[YOLO MQTT PUB] {"deviceId": "IOT52-RPI", "timestamp": "2026-08-14T11:32:49.541849", "color": "green", "confidence": 0.95}
+serial_data = G
+
+[YOLO ROI] red 0.86
+[YOLO MQTT PUB] {"deviceId": "IOT52-RPI", "timestamp": "2026-08-14T11:33:00.031396", "color": "red", "confidence": 0.86}
+serial_data = R 
+```
 
 ##### Arduino에서 수신된 값으로 서보모터 제어
 
+- 아두이노 소스에 processSerialCommand(char command), setProductColor(char color) 함수 추가
+- [sortingmachine.ino](./toyproject/ToyProjects06/arduino_part/sortingmachine.ino)
 
+##### 실행결과
 
+TODO 동영상
 
-### 유니티에서 컨베이어벨트 제어
+#### Unity에서 컨베이어 벨트 비상정지 제어
 
