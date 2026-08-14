@@ -499,7 +499,7 @@ autostart 사용할 것
 
 - data_interface.py 와 test_yolo.py 소스 통합
 - 물체인식 동시에 MQTT로 데이터 Publish
-- total_interface.py - [소스](./toyproject/ToyProjects06/raspberrypi_part/total_interface.py)
+- [total_interface.py](./toyproject/ToyProjects06/raspberrypi_part/total_interface.py)
 
 ![alt text](image-354.png)
 
@@ -542,6 +542,8 @@ serial_data = R
 ##### 실행결과
 
 https://github.com/user-attachments/assets/f8b2f35a-5dea-45f3-92ad-e6c08502d3ab
+
+- DC모터 속도 조절 필요
 
 #### Unity에서 컨베이어 벨트 비상정지 제어
 
