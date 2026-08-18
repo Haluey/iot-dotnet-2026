@@ -895,7 +895,7 @@ MonoBehaviour:
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
-        m_CallState: 2
+        m_CallState: 1
 --- !u!114 &684926444
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2500,7 +2500,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uBE44\uC0C1\uC815\uC9C0"
+  m_text: "\uBE44\uC0C1 \uC815\uC9C0"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: c80a2b11e369e924d9673637e901c1bb, type: 2}
   m_sharedMaterial: {fileID: 6000048305317299214, guid: c80a2b11e369e924d9673637e901c1bb, type: 2}

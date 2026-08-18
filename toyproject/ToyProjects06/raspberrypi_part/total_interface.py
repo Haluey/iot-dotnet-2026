@@ -100,8 +100,18 @@ def on_message(client, userdata, message):
             f'payload={payload}'
         )
 
-        # MQTT로 전달받은 명령을 Arduino로 전송
-        send_to_arduino(payload)    # 윈도우에서 비상정지 등의 메시지를 전달받아서 아두이노 제어
+        # JSON 문자열을 Pyton Dictionary으로 변환
+        data = json.loads(payload)
+
+        # control 키에 대한 값만 추출
+        control = data.get('control')   # T, S만 전달
+
+        if control:
+            # MQTT로 전달받은 명령을 Arduino로 전송
+            send_to_arduino(control)    # 윈도우에서 비상정지 등의 메시지를 전달받아서 아두이노 제어
+
+    except json.JSONDecodeError as error:
+        print(f'JSON 파싱 오류 : {error}')
 
     except Exception as error:
         print(f'MQTT 메시지 오류 : {error}')

@@ -5,6 +5,7 @@ using uPLibrary.Networking.M2Mqtt.Messages;
 using System.Text;
 using Newtonsoft.Json;
 using TMPro;
+using System;
 
 // M2MqttClient를 상속한 클래스
 public class SmartFactoryMqttClient : M2MqttUnityClient
@@ -32,9 +33,14 @@ public class SmartFactoryMqttClient : M2MqttUnityClient
     // 감지결과 클래스
     private ProductResult prdResult = null;
 
+    private string deviceId = string.Empty;
+    private string control_topic = string.Empty;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        deviceId = "IOT52-RPI";
+        control_topic = "smartfactory/52/control";
         autoConnect = true;
 
         base.Start();   // M2MqttUnityClient.start() 실행
@@ -131,4 +137,37 @@ public class SmartFactoryMqttClient : M2MqttUnityClient
         }
 
     }
+
+    public void Stop() {
+        Debug.Log("비상정지!");
+
+        var currDateTime = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss.ffffff");
+        // D, R, G, B, T(STOP), S(RESTART) 
+        string payload = $@"
+            {{
+                  ""deviceId"": ""{deviceId}"",
+                  ""timestamp"": ""{currDateTime}"",
+                  ""control"": ""T""
+            }}
+        ";
+
+        client.Publish(control_topic, Encoding.UTF8.GetBytes(payload), MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE, false);
+    }
+
+    public void Restart() {
+        Debug.Log("재가동!");
+
+        var currDateTime = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss.ffffff");
+        // D, R, G, B, T(STOP), S(RESTART) 
+        string payload = $@"
+            {{
+                  ""deviceId"": ""{deviceId}"",
+                  ""timestamp"": ""{currDateTime}"",
+                  ""control"": ""S""
+            }}
+        ";
+
+        client.Publish(control_topic, Encoding.UTF8.GetBytes(payload), MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE, false);
+    }
+
 }

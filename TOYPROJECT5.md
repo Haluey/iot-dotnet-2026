@@ -621,22 +621,10 @@ https://github.com/user-attachments/assets/93fe8a48-cdc5-4fcd-95d6-6246c8221896
 
 https://github.com/user-attachments/assets/c0a0d1e1-54c5-4372-a498-00fa327b00c1
 
-[ESP32-CAM 연동](./TOYPROJECT6.md)
-
-
-
-
-
-
-
-
-
-### ESP32-CAM 연동
+[이어서](./TOYPROJECT6.md)
 
 ### Database 데이터 저장
 
 ### WPF 모니터링 시스템
 
-### 벨트 제어
-
-- 모니터링 시스템에서 비상정지 기능
+[참고](https://github.com/hugoMGSung/iot-miniproject-2025/blob/main/miniproject3/README.md)
