@@ -38,7 +38,7 @@ Toyprojects07(AIKnowledgeSystem)
 └─ Server(Ai Server) - FastAPI + Python Functions
 ```
 
-#### 클라이언트 구현
+#### 클라이언트(WPF) 구현
 
 ##### Visual Studio WPF 프로젝트 생성
 
@@ -65,13 +65,23 @@ WPF 애플리케이션 프로젝트 생성. .NET 10.0 (LTS) 선택
 ![alt text](images/image-6.png)
 
 - 파일명에 공백 있으면 업로드 실패
+
+- 한글파일 인코딩 문제
+    - `[국가교통정보센터] Open_API_매뉴얼.pdf` 파일 업로드 하면
+    - 파일명이 `=?utf-8?B?W+q1reqwgOq1kO2GteygleuztOyEvO2EsF0gT3Blbl9BUElf66ek64m07Ja8LnBkZg==?=`로 변경
+    - 영문은 상관없음
+
 - 동일명의 파일이 올라가면 이전 파일 삭제, 새로 업로드
 
 
 
 
 
-#### 서버 구현
+
+
+
+
+#### 서버(Python) 구현
 
 ##### 필요 패키지 설치
 
@@ -156,3 +166,148 @@ async def upload(file: UploadFile = File(...)):
         'filename' : 'file.filename'
     }
 ```
+
+##### 한글 인코딩 문제 해결
+
+- WPF에서 전달된 한글 인코딩으로 변환된 파일명을 다시 한글파일명으로 디코딩해야 함
+
+```python
+from email.header import decode_header
+
+## 내부 함수 3 - UTF8 인코딩으로 전달된 한글문서명 디코딩 함수
+def decode_filename(filename: str):
+    decoded_parts = decode_header(filename)
+
+    result = ""
+
+    for part, encoding in decoded_parts:
+        if isinstance(part, bytes):
+            result += part.decode(encoding or "utf-8")
+        else:
+            result += part
+
+    return result
+```
+
+##### PDF 내 텍스트 추출
+
+- 업로드한 PDF를 읽어서 실제 글자를 가져올 수 있는지 확인
+- PyMuPDF 패키지 설치
+
+    ```powershell
+    > pip install pymupdf
+    ```
+
+- PDF 텍스트 추출함수
+
+    ```python
+    import pymupdf
+
+    ## 내부 함수 4 - PDF 로드 함수
+    def extract_pdf_text(pdf_path: Path):
+        doc = pymupdf.open(pdf_path)
+        pages = []
+
+        for page_number, page in enumerate(doc):
+            text = page.get_text()
+
+            page.append({
+                'page' : page_number + 1,
+                'text' : text
+            })
+
+        doc.close()
+
+        return pages
+    ```
+
+- 업로드된 PDF 텍스트 추출 확인 - PDF 원본
+
+    ![alt text](images/image-7.png)
+
+- Python에서 추출확인
+
+    ![alt text](images/image-8.png)
+
+##### PDF내용 Chunck 단위 분리
+
+- RAG는 PDF 전체를 한번에 검색하지 않음. 작은 텍스트 조각으로 나눠서 검색
+
+    ```python
+    ## 내부 함수 5 - Chunk 분리 함수
+    def split_into_chunk(pages, chunk_size=50, overlap=10):
+        chunks = []
+
+        for page in pages:
+            text = page['text']
+
+            start = 0
+            chunk_index = 0
+
+            while start < len(text):
+                end = start + chunk_size
+                chunk_text = text[start:end]
+
+                if chunk_text.strip():
+                    chunks.append({
+                        'page' : page['page'],
+                        'chunk_index' : chunk_index,
+                        'text' : chunk_text
+                    })
+
+                start += chunk_size - overlap
+                chunk_index += 1
+
+        return chunks
+    ```
+
+-  Chunk 분리 (길이 50, 오버랩 10) 결과
+
+    ![alt text](images/image-9.png)
+
+##### Embedding
+
+- Chunk 문장을 숫자 배열로 바꾸는 작업. 숫자 벡터로 추후 질문과 문서 Chunk 간의 의미가 얼마나 비슷한지 비교
+
+- Sentence Transformers 패키지 설치
+    - 텍스트를 고정길이 벡터로 변환하는 라이브러리
+    - 트랜스포머 : 자연어 처리시 기존 문제를 해결한 새 매커니즘. BERT, GPT
+    - Transformer 신경망 사용해서 문장의 의미를 숫자벡터로 표현하는 모델
+
+    ```powershell
+    > pip install sentence-transformers
+    ```
+
+- 임베딩 함수
+
+    ```python
+    from sentence_transformers import SentenceTransformer
+
+    # 임베딩 모델 선언 - 다국어(한국어 포함)용 트랜스포머 모델 필요
+    embedding_model = SentenceTransformer(
+        "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+    )
+
+    ## 내부 함수 6 - Embedding(임베딩) 함수
+    def create_embedding(chunks):
+        texts = [
+            chunk['text'] for chunk in chunks
+        ]
+
+        embeddings = embedding_model.encode(
+            texts,
+            convert_to_numpy = True
+        )
+
+        return embeddings
+    ```
+
+- 업로드 후 PDF 변환, Chunk 작업 Embedding
+
+- 최초 트랜스포머 모델 다운로드. C:\Users\User\.cache\huggingface\hub\
+
+    ![alt text](images/image-10.png)
+
+- Embedding 변환결과
+
+    ![alt text](images/image-11.png)
