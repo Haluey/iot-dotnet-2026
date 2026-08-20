@@ -20,20 +20,12 @@
 
 ### 스마트팩토리 MES 미니 플랫폼
 
-- [컨베이어벨트 조별 + MQTT + (WPF) + Unity 연계](./TOYPROJECT5.md)
+- [컨베이어벨트 + MQTT + (WPF) + Unity 연계](./TOYPROJECT5.md)
+- [컨베이어벨트 + ESP32-CAM + YOLO](./TOYPROJECT6.md)
 
-### IoT 스마트홈 통합 플랫폼
+### AI 문서 검색, 질의응답 시스템
 
-- MQTT WPF + WebAPI + Unity 연계
-
-### Unity ProductApp 기능 개선
-
-- 각 상품 클릭시 3D 박스와 연계
-- 로봇팔 오브젝트 연계
-
-### 실시간 채팅 시스템 + 챗봇 기능
-
-- Python AI + SignalR API
+- [AI 문서 검색, 질의응답 시스템](./TOYPROJECT7.md)
 
 ### 취업처 설명
 
@@ -95,3 +87,15 @@
 
     ![alt text](image-267.png)
 
+### IoT 스마트홈 통합 플랫폼
+
+- MQTT WPF + WebAPI + Unity 연계
+
+### Unity ProductApp 기능 개선
+
+- 각 상품 클릭시 3D 박스와 연계
+- 로봇팔 오브젝트 연계
+
+### 실시간 채팅 시스템 + 챗봇 기능
+
+- Python AI + SignalR API

@@ -765,3 +765,7 @@ runs/
 # 100MB 넘는 파일 반드시 제외
 *.pth
 *.pt
+
+# FastAPI 서버 업로드 폴더 제외
+toyproject/ToyProjects07/Server/uploads/
+uploads/
