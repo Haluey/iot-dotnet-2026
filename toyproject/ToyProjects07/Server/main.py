@@ -9,12 +9,23 @@ import re
 import uvicorn
 # import fitz
 import pymupdf
+import chromadb
+import ollama
 
 app = FastAPI()
 
 UPLOAD_DIR = Path('uploads')
 UPLOAD_DIR.mkdir(exist_ok=True)
 # os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+# ChromaDB 설정
+chroma_client = chromadb.PersistentClient(
+    path='chroma_db'
+)
+
+collection = chroma_client.get_or_create_collection(
+    name='documents'
+)
 
 # json과 dictionary로 쉽게 처리하기 위해서
 # 속성값을 규칙에 맞게 할당받기 위해서
@@ -25,24 +36,6 @@ class QuestionRequest(BaseModel):
 embedding_model = SentenceTransformer(
     "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
 )
-
-@app.get('/')
-def index():
-    return {
-        'message' : 'AI Knowledge Server'
-    }
-
-@app.get('/health')
-def health():
-    return {
-        'status' : 'OK'
-    }
-
-@app.post('/ask')
-def ask(request: QuestionRequest):
-    return {
-        'answer' : f'질문을 받음 : {request.question}'
-    }
 
 ## 내부 함수 1 - 파일명 공백 제거
 def get_safe_filename(filename: str):
@@ -148,6 +141,120 @@ def create_embedding(chunks):
 
     return embeddings
 
+## 내부 함수 7 - Chunk 저장함수
+def save_chunk_to_chroma(chunks, embeddings, filename):
+    ids = []
+    documents = []
+    metadatas = []
+    embedding_list = []
+
+    for i, chunk in enumerate(chunks):
+        ids.append(
+            f'{filename}_{chunk["page"]}_{chunk["chunk_index"]}'
+        )
+
+        documents.append(chunk['text'])
+
+        metadatas.append({
+            'filename': filename,
+            'page': chunk['page'],
+            'chunk_index': chunk['chunk_index']
+        })
+
+        embedding_list.append(embeddings[i].tolist())
+
+    collection.add(
+        ids=ids,
+        documents=documents,
+        metadatas=metadatas,
+        embeddings=embedding_list
+    )
+
+## 내부 함수 8 - Chunk 검색함수
+### top_k : 관련있는 값을 몇개까지 가져올것인지
+def search_documents(question: str, top_k=3):
+    # 질문을 Embedding으로 변환
+    question_embedding = embedding_model.encode(
+        question,
+        convert_to_numpy=True        
+    )
+
+    # ChromaDB 검색
+    results = collection.query(
+        query_embeddings=[
+            question_embedding.tolist()
+        ],
+        n_results=top_k
+    )
+
+    return results
+
+## 내부 함수 9 - Ollama 프롬프트 생성
+def generate_answer(question: str, documents:list):
+    context = "\n\n".join(documents)
+
+    prompt = f"""
+다음 문서 내용을 참조해서 질문에 답변하세요.
+문서에 없는 내용은 추측하지 말고 모른다고 답변하세요.
+
+[문서]
+{context}
+
+[질문]
+{question}
+
+[답변]
+    """
+
+    response = ollama.chat(
+        model='qwen3.5:2b',
+        messages=[
+            {
+                'role' : 'user',
+                'content' : prompt
+            }
+        ]
+    )
+
+    return response['message']['content']
+
+## HTTP 메서드 함수
+@app.get('/')
+def index():
+    return {
+        'message' : 'AI Knowledge Server'
+    }
+
+@app.get('/health')
+def health():
+    return {
+        'status' : 'OK'
+    }
+
+@app.post('/ask')
+def ask(request: QuestionRequest):
+    # DB에서 관련어 검색
+    results = search_documents(
+        request.question,
+        top_k=3
+    )
+
+    # 결과 리턴
+    documents = results['documents'][0]
+    metadatas = results['metadatas'][0]
+    distances = results['distances'][0]
+
+    # 검색된 결과를 Ollama(LLM)에 전달
+    answer = generate_answer(request.question, documents)
+
+    # 결과 반환
+    return {
+        'question' : request.question,
+        'answer' : answer,
+        'sources' : metadatas,
+        'distances' : distances
+    }
+
 @app.post('/upload')
 async def upload(file: UploadFile = File(...)):
     # save_path = os.path.join(UPLOAD_DIR, file.filename)
@@ -190,6 +297,9 @@ async def upload(file: UploadFile = File(...)):
         # Embedding
         embeddings = create_embedding(chunks)
 
+        # ChromaDB 저장
+        save_chunk_to_chroma(chunks, embeddings, save_path.name)
+
         print(f'페이지 수 : {len(pages)}')
         print(f'Chunk 수 : {len(chunks)}')
         print(f'Embedding 수 : {len(embeddings)}')
@@ -212,7 +322,8 @@ async def upload(file: UploadFile = File(...)):
             'original_filename' : file.filename,
             'saved_filename' : save_path.name,
             'pages' : len(pages),
-            'chunks' : len(chunks)
+            'chunks' : len(chunks),
+            'embeddings' : len(embeddings)
         }
 
     except HTTPException:

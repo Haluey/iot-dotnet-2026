@@ -304,10 +304,212 @@ def decode_filename(filename: str):
 
 - 업로드 후 PDF 변환, Chunk 작업 Embedding
 
-- 최초 트랜스포머 모델 다운로드. C:\Users\User\.cache\huggingface\hub\
+- 트랜스포머 모델 다운로드. `C:\Users\User\.cache\huggingface\hub\`
+
+- 최초 트랜스포머 모델 다운로드 시 시간 소요
 
     ![alt text](images/image-10.png)
 
 - Embedding 변환결과
 
     ![alt text](images/image-11.png)
+
+##### ChromaDB에 Embedding 저장
+
+- ChromaDB : 벡터 데이터베이스. RAG에서 관련자료 찾아주는 검색엔진 역할의 DB
+- Sqlite 베이스
+
+    ```powershell
+    > pip install chromadb
+    ```
+
+- ChromaDB 저장함수
+
+    ```python
+    ## 내부 함수 7 - Chunk 저장함수
+    def save_chunk_to_chroma(chunks, embeddings, filename):
+        ids = []
+        documents = []
+        metadatas = []
+        embedding_list = []
+
+        for i, chunk in enumerate(chunks):
+            ids.append(
+                f'{filename}_{chunk["page"]}_{chunk["chunk_index"]}'
+            )
+
+            documents.append(chunk['text'])
+
+            metadatas.append({
+                'filename': filename,
+                'page': chunk['page'],
+                'chunk_index': chunk['chunk_index']
+            })
+
+            embedding_list.append(embeddings[i].tolist())
+
+        collection.add(
+            ids=ids,
+            documents=documents,
+            metadatas=metadatas,
+            embeddings=embedding_list
+        )
+    ```
+
+- 서버 실행 후 DB 생성
+
+    ![alt text](images/image-12.png)
+
+- PDF 업로드 후 DB 현황. 벡터 검색용 테이블들이 구성되어 있음
+
+    ![alt text](images/image-13.png)
+
+- ChromaDB는 기본 Sqlite. 실무에서 사용할 DB로는 `PostgreSQL`로 변경
+
+##### 벡터 검색으로 관련 Chunk 찾기
+
+- 검색함수
+
+    ```python
+    ## 내부 함수 8 - Chunk 검색함수
+    ### top_k : 관련있는 값을 몇개까지 가져올 것인지
+    def search_documents(question: str, top_k=3):
+        # 질문을 Embedding으로 변환
+        question_embedding = embedding_model.encode(
+            question,
+            convert_to_numpy=True
+        )
+
+        # ChromaDB 검색
+        results = collection(
+            query_embeddings=[
+                question_embedding.tolist()
+            ],
+            n_results=top_k
+        )
+
+        return results
+    ```
+
+- `/ask` post 함수 수정
+
+    ```python
+    @app.post('/ask')
+    def ask(request: QuestionRequest):
+        # DB에서 관련어 검색
+        results = search_documents(
+            request.question
+        )
+
+        # 결과 리턴
+        return {
+            'question' : request.question,
+            'documents' : results['documents'][0],
+            'metadatas' : results['metadatas'][0],
+            'distances' : results['distances'][0]
+        }
+    ```
+
+    ![alt text](images/image-14.png)
+
+- 텍스트 대신 이미지를 PDF로 변환한 파일인 경우 - 변환불가. OCR 등을 사용해서 텍스트 추출
+
+    ![alt text](images/image-15.png)
+
+##### Ollama LLM 연결
+
+- https://ollama.com/ 설치
+- Ollama 동작
+
+    ```powershell
+    > ollama list
+    > ollama run qwen3.5:2b
+    ```
+
+- Ollama 패키지 설치
+
+    ```powershell
+    > pip install ollama
+    ```
+
+- Ollama 답변함수
+
+    ```python
+    ## 내부 함수 9 - Ollama 프롬프트 생성
+    def generate_answer(question: str, documents:list):
+        context = "\n\n".join(documents)
+
+        prompt = f"""
+    다음 문서 내용을 참조해서 질문에 답변하세요.
+    문서에 없는 내용은 추측하지 말고 모른다고 답변하세요.
+
+    [문서]
+    {context}
+
+    [질문]
+    {question}
+
+    [답변]
+        """
+
+        response = ollama.chat(
+            model='qwen3.5:2b',
+            messages=[
+                {
+                    'role' : 'user',
+                    'content' : 'prompt'
+                }
+            ]
+        )
+
+        return response['message']['content']
+    ```
+
+- /ask post함수 수정
+
+    ```python
+    @app.post('/ask')
+    def ask(request: QuestionRequest):
+        # DB에서 관련어 검색
+        results = search_documents(
+            request.question,
+            top_k=5
+        )
+
+        # 결과 리턴
+        documents = results['documents'][0]
+        metadatas = results['metadatas'][0]
+        distances = results['distances'][0]
+
+        # 검색된 결과를 Ollama(LLM)에 전달
+        answer = generate_answer(request.question, documents)
+
+        # 결과 반환
+        return {
+            'question' : request.question,
+            'answer' : answer,
+            'sources' : metadatas,
+            'distances' : distances
+        }
+    ```
+
+- Ollama 사용 결과 확인
+
+    ![alt text](images/image-16.png)
+
+- Ollama, Local LLM에 질문을 보내고 응답받는 시간이 오래 걸림. 최소 20초
+- OpenAI나 Gemini 등의 상용 LLM을 사용하면 사라질 현상
+
+- ChatGPT(OpenAI)로 변경했을 때 결과 화면 - 같은 벡터 검색결과로 LLM 실행결과가 다르게 나옴. 결과 도출시간 5초 정도
+
+    ![alt text](images/image-17.png)
+
+##### 추가 작업
+
+- 질문 작업 엔터로 처리
+- 질문 진행동안 버튼 비활성화 
+- 프로그레스바(서클) LLM 처리시간동안 진행상태 표시
+- WPF JSON 파싱
+- 예외처리(서버꺼짐, WPF앱 꺼짐)
+
+
