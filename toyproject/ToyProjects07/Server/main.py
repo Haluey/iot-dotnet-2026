@@ -10,7 +10,9 @@ import uvicorn
 # import fitz
 import pymupdf
 import chromadb
-import ollama
+# import ollama
+# from openai import OpenAI
+from google import genai
 
 app = FastAPI()
 
@@ -36,6 +38,14 @@ class QuestionRequest(BaseModel):
 embedding_model = SentenceTransformer(
     "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
 )
+
+# OPENAI API 키 설정
+# client = OpenAI(
+#     api_key=os.getenv("OPENAI_API_KEY")
+# )
+
+# Gemini API 키 설정
+client = genai.Client()
 
 ## 내부 함수 1 - 파일명 공백 제거
 def get_safe_filename(filename: str):
@@ -189,7 +199,7 @@ def search_documents(question: str, top_k=3):
 
     return results
 
-## 내부 함수 9 - Ollama 프롬프트 생성
+## 내부 함수 9 - Ollama 프롬프트 생성 or OPENAI 프롬프트 생성
 def generate_answer(question: str, documents:list):
     context = "\n\n".join(documents)
 
@@ -206,17 +216,32 @@ def generate_answer(question: str, documents:list):
 [답변]
     """
 
-    response = ollama.chat(
-        model='qwen3.5:2b',
-        messages=[
-            {
-                'role' : 'user',
-                'content' : prompt
-            }
-        ]
+    ## Ollama API Key 설정
+    # response = ollama.chat(
+    #     model='qwen3.5:2b',
+    #     messages=[
+    #         {
+    #             'role' : 'user',
+    #             'content' : prompt
+    #         }
+    #     ]
+    # )
+    # return response['message']['content']
+
+    ## OpenAI API Key 설정
+    # response = client.responses.create(
+    #     model="gpt-5.6",
+    #     input=prompt
+    # )
+    # return response.output_text
+
+    ## Gemini API Key 설정
+    response = client.models.generate_content(
+        model="gemini-3.6-flash",
+        contents=prompt
     )
 
-    return response['message']['content']
+    return response.text
 
 ## HTTP 메서드 함수
 @app.get('/')
@@ -236,7 +261,7 @@ def ask(request: QuestionRequest):
     # DB에서 관련어 검색
     results = search_documents(
         request.question,
-        top_k=3
+        top_k=5
     )
 
     # 결과 리턴

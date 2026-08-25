@@ -6,6 +6,17 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+    <ApplicationIcon>ai-assistant.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="ai-assistant.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DevExpress.Wpf.Controls" Version="26.1.4" />
+    <PackageReference Include="DevExpress.Wpf.Core" Version="26.1.4" />
+    <PackageReference Include="DevExpress.Wpf.Grid" Version="26.1.4" />
+  </ItemGroup>
 
 </Project>
