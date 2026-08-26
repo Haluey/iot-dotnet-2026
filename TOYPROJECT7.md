@@ -575,6 +575,7 @@ def decode_filename(filename: str):
 
 - 실행결과
 
-    TODO 동영상
+    https://github.com/user-attachments/assets/9a531b8d-8a27-439b-b771-75c6d26c4d50
+
 
 
