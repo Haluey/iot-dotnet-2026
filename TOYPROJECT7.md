@@ -612,4 +612,4 @@ https://www.devexpress.com/
 
 - 실행결과
 
-    TODO 동영상 업로드
+    https://github.com/user-attachments/assets/413c2b98-ada3-4d42-9f14-ab5e0e90c55d
