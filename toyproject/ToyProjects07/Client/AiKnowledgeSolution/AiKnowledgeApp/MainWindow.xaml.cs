@@ -57,6 +57,7 @@ namespace AiKnowledgeApp {
 
             try {
                 BtnQuestion.IsEnabled = false;  // 버튼 비활성화
+                PrgAnswer.Visibility = Visibility.Visible;
 
                 TxtAnswer.Text = "AI가 답변을 생성하고 있습니다..." + Environment.NewLine;
                 GrdSources.ItemsSource = null;  // 초기화
@@ -106,6 +107,7 @@ namespace AiKnowledgeApp {
             }
             finally {
                 BtnQuestion.IsEnabled = true;   // 버튼 활성화
+                PrgAnswer.Visibility = Visibility.Collapsed;
             }
         }
 

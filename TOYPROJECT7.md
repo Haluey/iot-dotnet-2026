@@ -84,12 +84,6 @@ WPF 애플리케이션 프로젝트 생성. .NET 10.0 (LTS) 선택
 
     ![alt text](images/image-18.png)
 
-
-
-
-
-
-
 #### 서버(Python) 구현
 
 ##### 필요 패키지 설치
@@ -517,13 +511,31 @@ def decode_filename(filename: str):
 
 ##### 추가 작업
 
-- 질문 작업 엔터로 처리
+- [X] 프로그레스바(서클) LLM 처리시간동안 진행상태 표시
+- [X] 예외처리(서버꺼짐, WPF앱 꺼짐)
+- [X] UI 스타일 변경 (MahApps. UI Framework 등)
 
-- 프로그레스바(서클) LLM 처리시간동안 진행상태 표시
-- 예외처리(서버꺼짐, WPF앱 꺼짐)
-- UI 스타일 변경 (MahApps. UI Framework 등)
+##### 문제점 - 추후 개선사항
+
+- [ ] 중복등록 방지
+    - 같은 문서를 여러번 업로드 후 문맥 검색 시 내용이 제대로 검색안되는 현상
+        - Chunk와 Embedding을 ChromaDB에 중복 저장되기 때문
+        - 회사규칙.pdf 3번 업로드. 회사규칙.pdf, 회사규칙_1.pdf, 회사규칙_2.pdf 등
+        - 같은 회사규칙이 다른 filename, 다른 id로 여러개 저장. top_k 검색에서 밀려날 수 있음
+        - RAG 품질에 저하
+    - 파일 내용을 SHA-256 해시로 검사 후 등록 방지
+
+- [ ] Embedding 성능 개선
+
+- [ ] Local LLM(Ollama)에서 속도 개선방법
+
+- [ ] 이미지 변환된 PDF를 OCR로 텍스트 인식
 
 ##### DevExpress 적용
+
+WPF앱을 WinForms앱처럼 UI화면을 구성하기 위해서 사용하는 UI컴포넌트
+
+https://www.devexpress.com/
 
 - 첫번째 : 확장 > DevExpress < Project Converter로 일괄변경
 
@@ -573,9 +585,31 @@ def decode_filename(filename: str):
 
 - GridControl 사용시 주의점 : 상위 Grid RowDefinition이 Auto일 때 Height 속성이 필수!
 
+- 실행화면
+
+    ![alt text](images/image-20.png)
+
 - 실행결과
 
     https://github.com/user-attachments/assets/9a531b8d-8a27-439b-b771-75c6d26c4d50
 
+#### 추가 작업
 
+##### 검색 중 진행상태 표시
 
+- DevExpress ProgressBarEdit 사용
+ 
+    ```xml
+    <dxe:ProgressBarEdit Grid.Row="0" x:Name="PrgAnswer"
+                         Height="20" Margin="5,0"
+                         Minimum="0" Maximum="100"
+                         Visibility="Collapsed">
+        <dxe:ProgressBarEdit.StyleSettings>
+            <dxe:ProgressBarMarqueeStyleSettings />
+        </dxe:ProgressBarEdit.StyleSettings>
+    </dxe:ProgressBarEdit>
+    ```
+
+- 실행결과
+
+    TODO 동영상 업로드
